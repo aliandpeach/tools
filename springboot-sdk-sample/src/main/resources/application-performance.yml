@@ -1,0 +1,35 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  application:
+    name: performance-service
+  thymeleaf:
+    cache: false
+    enabled: true
+    prefix: classpath:/thymeleaf/
+    suffix: .html
+    mode: HTML
+    template-resolver-order: 1
+    encoding: UTF-8
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+      resolve-lazily: true
+server:
+  port: 22912
+  servlet:
+    context-path: /
+    encoding:
+      force: true # HttpEncodingAutoConfiguration
+  ssl:
+    enabled: true
+    key-store: classpath:key/simple.keystore
+    key-password: Admin@1234
+    key-store-type: JKS
+    key-store-password: Admin@123
+    client-auth: NONE

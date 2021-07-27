@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="cn" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+    <script type="text/javascript" th:src="@{/jquery/jquery-1.8.0.min.js}" ></script>
+    <script type="text/javascript" th:src="@{/resource/common.js}" ></script>
+</head>
+<body>
+    <div><h5>SDK测试页面(批量)</h5></div>
+    <div style="margin-top: 10px">
+        <span>文件检测服务端：</span>
+        <input disabled id="toHost" name="toHost" th:value="${host}" style="width: 500px"/>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <div style="margin-top: 10px;">
+            <span>备注1： 选择文件夹批量执行检测， 每个检测请求是随机选择文件夹内的文件</span>
+        </div>
+        <div style="margin-top: 10px;">
+            <span>备注2： 选择文件批量执行检测， 每个检测请求都是固定选择的文件</span>
+        </div>
+        <div style="margin-top: 10px;">
+            <span>备注3： 大文件的检测根据实际标准， 按照文件的大小去指定下发请求的总时长</span>
+        </div>
+        <div style="margin-top: 20px;">
+            <div>
+                <span>检测目标路径：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <input id="_target_path" name="_target_path" placeholder="请输入检测目标路径" th:value="${path}" style="width: 500px"/><span id="_target_path_notice"></span>
+            </div>
+            <div style="margin-top: 20px;">
+                <span>请选择文件/文件夹：</span>
+                <select id="fileList" name="fileList" style="width: 500px">
+                    <option value="请选择文件">请选择文件/文件夹</option>
+                    <option th:each="_fileInfo:${fileList}" th:value="${_fileInfo.path}" th:filename="${_fileInfo.name}" th:text="${_fileInfo.size} + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' + ${_fileInfo.path}" ></option>
+                </select>
+                <a id="_reload_file" style="text-decoration:underline;cursor: pointer">重新加载</a>
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <label>执行总次数： &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input id="total" name="total" value="1" onchange="reCalc();" onkeyup="reCalc()"/>
+        </div>
+        <div style="margin-top: 10px;">
+            <label>下发请求总时长：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input id="time" name="time" value="1" onchange="reCalc();" onkeyup="reCalc()"/><label>每秒下发<label style="color: #FF0000FF" id="per_second"></label>个请求</label>
+        </div>
+    </div>
+    <div style="margin-top: 20px;">
+        <button id="_upload">执行检测(1B-10M)</button>
+        <button id="_upload_big">大文件检测(10M-4G)</button>
+
+        <a th:href="@{/logs/sdk.log}" target="_blank" style="margin-right: 10px;margin-top: 10px">日志</a>
+        <a th:href="@{/logs/http.log}" target="_blank"style="margin-right: 10px;margin-top: 10px">结果统计(1B-10M)</a>
+        <a th:href="@{/logs/http_response.log}" target="_blank"style="margin-right: 10px;margin-top: 10px">事件信息(1B-10M)</a>
+        <a th:href="@{/logs/sftp.log}" target="_blank"style="margin-right: 10px;margin-top: 10px">结果统计(10M-4G)</a>
+        <a th:href="@{/logs/sftp_response.log}" target="_blank"style="margin-right: 10px;margin-top: 10px">事件信息(10M-4G)</a>
+    </div>
+    <div style="margin-top: 10px;">
+        <span id="_result_value" style="font-size:15px;"></span>
+    </div>
+</body>
+<script th:inline="javascript">
+
+    $(function () {
+        $("#_upload").click(function () {
+            upload(this.id);
+        });
+        $("#_upload_big").click(function () {
+            uploadBig(this.id);
+        });
+        $("#_reload_file").click(function () {
+            reloadFile(this.id);
+        });
+        reCalc();
+    });
+    function reCalc() {
+        let _total = $("#total").val();
+        let _time = $("#time").val();
+        if (isNaN(_total) || _total <= 0) {
+            $("#total").css("border-color", "#FF0000FF")
+            return;
+        }
+        if (isNaN(_time) || _time <= 0) {
+            $("#time").css("border-color", "#FF0000FF")
+            return;
+        }
+        $("#total").css("border-color", "")
+        $("#time").css("border-color", "")
+        $("#per_second").html((_total / _time).toFixed(2));
+    }
+    function reloadFile() {
+        $("#_target_path_notice").html("");
+        let _targetPath = $("#_target_path").val();
+        if(!_targetPath){
+            $("#_target_path_notice").html("目标路径为空");
+            return;
+        }
+        console.log(_targetPath);
+        _targetPath = _targetPath.replaceAll("\\", "/")
+        $.ajax({
+            type: "get",
+            url: "/performance/batch/file/reload",
+            async: true,
+            data: "path=" + _targetPath,
+            success: function (result) {
+                $("#fileList option").remove();
+                console.log(result);
+                for(var i in result){
+                    var _fileInfo = result[i];
+                    $("#fileList").append('<option value="' + _fileInfo.path + '" filename="' + _fileInfo.name + '">' + _fileInfo.size + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' + _fileInfo.path + '</option>');
+                }
+            }
+        });
+    }
+
+    function upload() {
+        $("#_result_value").html("");
+        if (!$("#fileList option:selected").attr("filename")) {
+            $("#_result_value").html("请选择文件")
+            return;
+        }
+
+        let _total = $("#total").val();
+        let _time = $("#time").val();
+        if (isNaN(_total) || _total <= 0) {
+            $("#total").css("border-color", "#FF0000FF")
+            $("#_result_value").html("请求次数为空或者不是数字");
+            return;
+        }
+        if (isNaN(_time) || _time <= 0) {
+            $("#time").css("border-color", "#FF0000FF")
+            $("#_result_value").html("请求时长为空或者不是数字");
+            return;
+        }
+
+        var path = $("#fileList option:selected").val();
+        var name = $("#fileList option:selected").attr("filename");
+        $.ajax({
+            type: "post",
+            contentType: "application/json",
+            url: "/performance/batch/upload",
+            data: '{"name": "' + name + '", "path": "' + path + '", "total": "' + _total + '", "time": "' + _time + '"}',
+            async: true,
+            success: function (result) {
+                if (!result) {
+                    console.log(result)
+                    return;
+                }
+                $("#_result_value").html(JSON.stringify(result));
+            },
+            error: function(result){
+                if (!result) {
+                    console.log(result)
+                    return;
+                }
+                $("#_result_value").html(result.responseText);
+            }
+        });
+    }
+    function uploadBig() {
+        $("#_result_value").html("");
+        if (!$("#fileList option:selected").attr("filename")) {
+            $("#_result_value").html("请选择文件")
+            return;
+        }
+        let path = $("#fileList option:selected").val();
+        let name = $("#fileList option:selected").attr("filename");
+
+        let _total = $("#total").val();
+        let _time = $("#time").val();
+        if (isNaN(_total) || _total <= 0) {
+            $("#total").css("border-color", "#FF0000FF")
+            $("#_result_value").html("请求次数为空或者不是数字");
+            return;
+        }
+        if (isNaN(_time) || _time <= 0) {
+            $("#time").css("border-color", "#FF0000FF")
+            $("#_result_value").html("请求时长为空或者不是数字");
+            return;
+        }
+
+        $.ajax({
+            type: "post",
+            contentType: "application/json",
+            url: "/performance/batch/upload/big",
+            data: '{"name": "' + name + '", "path": "' + path + '", "total": "' + _total + '", "time": "' + _time + '"}',
+            async: true,
+            success: function (result) {
+                if (!result) {
+                    console.log(result)
+                    return;
+                }
+                $("#_result_value").html(JSON.stringify(result));
+            },
+            error: function(result){
+                if (!result) {
+                    console.log(result)
+                    return;
+                }
+                $("#_result_value").html(result.responseText);
+            }
+        });
+    }
+</script>
+</html>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="off" monitorInterval="1800">
+    <properties>
+        <property name="LOG_HOME">${sys:log.home}/static/</property>
+        <property name="ERROR_LOG_FILE_NAME">error</property>
+        <property name="DEBUG_LOG_FILE_NAME">debug</property>
+        <property name="INFO_LOG_FILE_NAME">info</property>
+    </properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout charset="UTF-8" pattern="%d %-5p (%F:%L) - %m%n"/>
+        </Console>
+        <RollingRandomAccessFile name="performance"
+                                 fileName="${LOG_HOME}/logs/performance.log"
+                                 filePattern="${LOG_HOME}/logs/performance/performance.log.%d{yyyy-MM-dd}-%i.gz">
+            <PatternLayout charset="UTF-8"
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="http"
+                                 fileName="${LOG_HOME}/logs/http.log"
+                                 filePattern="${LOG_HOME}/logs/http/http.log.%d{yyyy-MM-dd}-%i.gz">
+            <PatternLayout charset="UTF-8"
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="sftp"
+                                 fileName="${LOG_HOME}/logs/sftp.log"
+                                 filePattern="${LOG_HOME}/logs/sftp/sftp.log.%d{yyyy-MM-dd}-%i.gz">
+            <PatternLayout charset="UTF-8"
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="http_response"
+                                 fileName="${LOG_HOME}/logs/http_response.log"
+                                 filePattern="${LOG_HOME}/logs/http_response/http_response.log.%d{yyyy-MM-dd}-%i.gz">
+            <PatternLayout charset="UTF-8"
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="sftp_response"
+                                 fileName="${LOG_HOME}/logs/sftp_response.log"
+                                 filePattern="${LOG_HOME}/logs/sftp_response/sftp_response.log.%d{yyyy-MM-dd}-%i.gz">
+            <PatternLayout charset="UTF-8"
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="sdk"
+                                 fileName="${LOG_HOME}/logs/sdk.log"
+                                 filePattern="${LOG_HOME}/logs/sdk/sdk.log.%d{yyyy-MM-dd}-%i.gz">
+            <PatternLayout charset="UTF-8"
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <logger name="performance" level="debug" includeLocation="true" additivity="false">
+            <appender-ref ref="performance"/>
+        </logger>
+        <logger name="http" level="debug" includeLocation="true" additivity="false">
+            <appender-ref ref="http"/>
+        </logger>
+        <logger name="sftp" level="debug" includeLocation="true" additivity="false">
+            <appender-ref ref="sftp"/>
+        </logger>
+        <logger name="http_response" level="debug" includeLocation="true" additivity="false">
+            <appender-ref ref="http_response"/>
+        </logger>
+        <logger name="sftp_response" level="debug" includeLocation="true" additivity="false">
+            <appender-ref ref="sftp_response"/>
+        </logger>
+        <logger name="com.spinfosec" level="debug" includeLocation="true" additivity="false">
+            <appender-ref ref="sdk"/>
+        </logger>
+
+        <root level="info" includeLocation="true">
+            <appender-ref ref="Console"/>
+        </root>
+    </Loggers>
+</Configuration>

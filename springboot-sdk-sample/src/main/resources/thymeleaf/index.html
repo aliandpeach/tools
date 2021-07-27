@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="cn" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+    <script type="text/javascript" th:src="@{/jquery/jquery-1.8.0.min.js}" ></script>
+    <script type="text/javascript" th:src="@{/resource/common.js}" ></script>
+</head>
+<body>
+    <div><h5>SDK测试页面</h5></div>
+    <div style="margin-top: 10px">
+        <span>文件检测服务端：</span>
+        <input id="toHost" name="toHost" th:value="${host}" style="width: 500px"/>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <span>SDK端文件选择：</span>
+        <select id="fileList" name="fileList" style="width: 500px">
+            <option value="请选择文件">请选择文件</option>
+            <option th:each="_fileInfo:${fileList}" th:value="${_fileInfo.path}" th:filename="${_fileInfo.name}" th:text="${_fileInfo.size} + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' + ${_fileInfo.path}" ></option>
+        </select>
+        <!--<a th:href="@{/performance/index?order=${order}}">名称${orderName}</a>
+        <a th:href="@{/performance/index?order=${order}}">大小${orderName}</a>-->
+        <a id="_reload_file" style="text-decoration:underline;cursor: pointer">重新加载</a>
+    </div>
+    <div style="margin-top: 10px;">
+        <button id="_upload">执行检测(1B-10M)</button>
+        <button id="_upload_big">大文件检测(10M-4G)</button>
+    </div>
+    <div style="margin-top: 10px;">
+        <span id="_result_value" style="font-size:15px;"></span>
+    </div>
+</body>
+<script th:inline="javascript">
+
+    $(function () {
+        $("#_upload").click(function () {
+            upload(this.id);
+        });
+        $("#_upload_big").click(function () {
+            uploadBig(this.id);
+        });
+        $("#_reload_file").click(function () {
+            reloadFile(this.id);
+        });
+    });
+
+    function reloadFile() {
+        $.ajax({
+            type: "get",
+            url: "/performance/file/reload",
+            async: true,
+            success: function (result) {
+                $("#fileList option").remove();
+                console.log(result);
+                for(var i in result){
+                    var _fileInfo = result[i];
+                    $("#fileList").append('<option value="' + _fileInfo.path + '" filename="' + _fileInfo.name + '">' + _fileInfo.size + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' + _fileInfo.path + '</option>');
+                }
+            }
+        });
+    }
+
+    function upload() {
+        $("#_result_value").html("");
+        if (!$("#fileList option:selected").attr("filename")) {
+            $("#_result_value").html("请选择文件")
+            return;
+        }
+        var path = $("#fileList option:selected").val();
+        var name = $("#fileList option:selected").attr("filename");
+        $.ajax({
+            type: "post",
+            contentType: "application/json",
+            url: "/performance/upload",
+            data: '{"name": "' + name + '", "path": "' + path + '"}',
+            async: true,
+            success: function (result) {
+                if (!result) {
+                    console.log(result)
+                    return;
+                }
+                $("#_result_value").html(JSON.stringify(result));
+            },
+            error: function(result){
+                if (!result) {
+                    console.log(result)
+                    return;
+                }
+                $("#_result_value").html(result.responseText);
+            }
+        });
+    }
+    function uploadBig() {
+        $("#_result_value").html("");
+        if (!$("#fileList option:selected").attr("filename")) {
+            $("#_result_value").html("请选择文件")
+            return;
+        }
+        var path = $("#fileList option:selected").val();
+        var name = $("#fileList option:selected").attr("filename");
+        $.ajax({
+            type: "post",
+            contentType: "application/json",
+            url: "/performance/upload/big",
+            data: '{"name": "' + name + '", "path": "' + path + '"}',
+            async: true,
+            success: function (result) {
+                if (!result) {
+                    console.log(result)
+                    return;
+                }
+                $("#_result_value").html(JSON.stringify(result));
+            },
+            error: function(result){
+                if (!result) {
+                    console.log(result)
+                    return;
+                }
+                $("#_result_value").html(result.responseText);
+            }
+        });
+    }
+</script>
+</html>
