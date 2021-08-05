@@ -1,0 +1,21 @@
+package com.independentsoft.msg;
+
+public enum DisplayType
+{
+    AGENT, 
+    DISTRIBUTION_LIST, 
+    FOLDER, 
+    FOLDER_LINK, 
+    FOLDER_SPECIAL, 
+    FORUM, 
+    GLOBAL_ADDRESS_BOOK, 
+    LOCAL_ADDRESS_BOOK, 
+    MAIL_USER, 
+    MODIFIABLE, 
+    ORGANIZATION, 
+    PRIVATE_DISTRIBUTION_LIST, 
+    REMOTE_MAIL_USER, 
+    WIDE_AREA_NETWORK_ADDRESS_BOOK, 
+    NOT_SPECIFIC, 
+    NONE;
+}
