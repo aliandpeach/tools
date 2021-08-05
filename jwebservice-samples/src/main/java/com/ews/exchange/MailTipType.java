@@ -1,0 +1,15 @@
+package com.ews.exchange;
+
+public enum MailTipType
+{
+    ALL, 
+    OUT_OF_OFFICE_MESSAGE, 
+    MAILBOX_FULL_STATUS, 
+    CUSTOM_MAIL_TIP, 
+    EXTERNAL_MEMBER_COUNT, 
+    TOTAL_MEMBER_COUNT, 
+    MAX_MESSAGE_SIZE, 
+    DELIVERY_RESTRICTION, 
+    MODERATION_STATUS, 
+    INVALID_RECIPIENT;
+}
