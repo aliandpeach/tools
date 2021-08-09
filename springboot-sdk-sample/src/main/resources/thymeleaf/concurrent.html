@@ -52,6 +52,9 @@
         </div>
     </div>
     <div style="margin-top: 20px;">
+        <input id="_async" type="checkbox" checked="checked" value="1"/><label>同步返回结果</label>
+    </div>
+    <div style="margin-top: 20px;">
         <button id="_upload">执行检测(1B-10M)</button>
         <button id="_upload_big">大文件检测(10M-4G)</button>
 
@@ -141,10 +144,14 @@
 
         var path = $("#fileList option:selected").val();
         var name = $("#fileList option:selected").attr("filename");
+
+        let _checked = $("#_async").prop("checked");
+        let _async = !_checked ? "/async" : "";
+
         $.ajax({
             type: "post",
             contentType: "application/json",
-            url: "/performance/batch/upload",
+            url: "/performance/batch/upload" + _async,
             data: '{"name": "' + name + '", "path": "' + path + '", "total": "' + _total + '", "time": "' + _time + '"}',
             async: true,
             success: function (result) {
@@ -185,10 +192,13 @@
             return;
         }
 
+        let _checked = $("#_async").prop("checked");
+        let _async = !_checked ? "/async" : "";
+
         $.ajax({
             type: "post",
             contentType: "application/json",
-            url: "/performance/batch/upload/big",
+            url: "/performance/batch/upload/big" + _async,
             data: '{"name": "' + name + '", "path": "' + path + '", "total": "' + _total + '", "time": "' + _time + '"}',
             async: true,
             success: function (result) {

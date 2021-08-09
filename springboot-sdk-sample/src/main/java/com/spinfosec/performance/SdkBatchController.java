@@ -10,6 +10,7 @@ import com.spinfosec.core.Response;
 import com.spinfosec.core.SpinfoExecutor;
 import com.spinfosec.core.SpinfoInfo;
 import com.spinfosec.exception.BaseResponse;
+import com.spinfosec.mq.MessageCenter;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,7 +150,7 @@ public class SdkBatchController implements InitializingBean
     public BaseResponse<EventResult> upload(@RequestBody @Validated(UploaderInfo.SdkBatchGroup.class) UploaderInfo uploaderInfo) throws IOException
     {
         AtomicInteger counter = new AtomicInteger(0);
-        double _semaphore = uploaderInfo.getTotal() / uploaderInfo.getTime() < 1 ? 1 : uploaderInfo.getTotal() / uploaderInfo.getTime();
+        double _semaphore = uploaderInfo.getTime() / uploaderInfo.getTotal() < 1 ? 1 : uploaderInfo.getTime() / uploaderInfo.getTotal();
         RateLimiter limiter = RateLimiter.create(_semaphore);
 
         int _total = uploaderInfo.getTotal();
@@ -248,7 +249,85 @@ public class SdkBatchController implements InitializingBean
         long success = result.stream().filter(r -> r.getStatus() == 200).count();
         long failed = result.stream().filter(r -> r.getStatus() != 200).count();
         result.stream().filter(r -> r.getStatus() != 200).forEach(rr -> http.debug("failed : " + rr.toString()));
-        http.debug("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个");
+        http.debug("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个" + "\n");
+        return BaseResponse.<EventResult>ok(new EventResult().ofMsg("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个").ofUseTime(end - start));
+    }
+
+    @PostMapping("/upload/async")
+    public BaseResponse<EventResult> uploadAsync(@RequestBody @Validated(UploaderInfo.SdkBatchGroup.class) UploaderInfo uploaderInfo) throws IOException
+    {
+        AtomicInteger counter = new AtomicInteger(0);
+        double _semaphore = uploaderInfo.getTime() / uploaderInfo.getTotal() < 1 ? 1 : uploaderInfo.getTime() / uploaderInfo.getTotal();
+        RateLimiter limiter = RateLimiter.create(_semaphore);
+
+        int _total = uploaderInfo.getTotal();
+        String path = uploaderInfo.getPath();
+        File file = new File(path);
+        if (!file.exists())
+        {
+            return BaseResponse.<EventResult>ok(new EventResult().ofMsg("文件或者文件夹不存在, path=" + path));
+        }
+        List<File> targetFileList = FileUtil.loopFiles(file);
+        if (targetFileList.size() == 0)
+        {
+            return BaseResponse.<EventResult>ok(new EventResult().ofMsg("文件数为0, path=" + path));
+        }
+        http.debug("{} 文件总数 = {}", path, _total);
+        long start = System.currentTimeMillis();
+
+        http.debug("总请求数量= {}", _total);
+        http.debug("每秒请求次数= {}", _semaphore);
+
+        List<CompletableFuture<Response>> futures = new ArrayList<>();
+        ExecutorService service = Executors.newFixedThreadPool(_total);
+
+        BlockingQueue<Long> ttimes = new LinkedBlockingQueue<>();
+        IntStream.range(0, _total).forEach(_i ->
+        {
+            int _index = _i >= targetFileList.size() ? _i % targetFileList.size() : _i;
+            System.out.println("index - " + _index);
+            CompletableFuture<Response> future = CompletableFuture.supplyAsync(() ->
+            {
+                String id = null;
+                try
+                {
+                    limiter.acquire(1);
+                    long reqStart = System.currentTimeMillis();
+                    File data = targetFileList.get(_index);
+
+                    FileInfo fileInfo = new FileInfo(data.getName(), data.getPath());
+                    HttpRequest request = HttpRequest.uploader().file(fileInfo).async().manager(new Callback()).build();
+                    Response result = SpinfoExecutor.create().upload(request);
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    return new Response().id(e.getMessage() + "-" + counter.incrementAndGet()).status(405);
+                }
+            }, service);
+            futures.add(future);
+        });
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        List<Response> result = new ArrayList<>();
+        futures.forEach(f ->
+        {
+            try
+            {
+                result.add(f.get());
+            }
+            catch (InterruptedException | ExecutionException e)
+            {
+                e.printStackTrace();
+            }
+        });
+        long end = System.currentTimeMillis();
+        http.debug("总数" + _total + " 个请求, 每秒请求" + _semaphore + "个, 完成时间  = {}", end - start);
+        long success = result.stream().filter(r -> r.getStatus() == 200).count();
+        long failed = result.stream().filter(r -> r.getStatus() != 200).count();
+        result.stream().filter(r -> r.getStatus() != 200).forEach(rr -> http.debug("failed : " + rr.toString()));
+        http.debug("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个" + "\n");
         return BaseResponse.<EventResult>ok(new EventResult().ofMsg("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个").ofUseTime(end - start));
     }
 
@@ -257,7 +336,7 @@ public class SdkBatchController implements InitializingBean
     {
         AtomicInteger counter = new AtomicInteger(0);
 
-        double _semaphore = uploaderInfo.getTotal() / uploaderInfo.getTime() < 1 ? 1 : uploaderInfo.getTotal() / uploaderInfo.getTime();
+        double _semaphore = uploaderInfo.getTime() / uploaderInfo.getTotal() < 1 ? 1 : uploaderInfo.getTime() / uploaderInfo.getTotal();
         RateLimiter limiter = RateLimiter.create(_semaphore);
 
         int _total = uploaderInfo.getTotal();
@@ -360,7 +439,91 @@ public class SdkBatchController implements InitializingBean
         long success = result.stream().filter(r -> r.getStatus() == 200).count();
         long failed = result.stream().filter(r -> r.getStatus() != 200).count();
         result.stream().filter(r -> r.getStatus() != 200).forEach(rr -> sftp.debug("failed : " + rr.toString()));
-        sftp.debug("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个");
+        sftp.debug("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个" + "\n");
+        return BaseResponse.<EventResult>ok(new EventResult().ofMsg("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个").ofUseTime(end - start));
+    }
+
+    @PostMapping("/upload/big/async")
+    public BaseResponse<EventResult> uploadBigFileAsync(@RequestBody @Validated(UploaderInfo.SdkBatchGroup.class) UploaderInfo uploaderInfo)
+    {
+        AtomicInteger counter = new AtomicInteger(0);
+
+        double _semaphore = uploaderInfo.getTime() / uploaderInfo.getTotal() < 1 ? 1 : uploaderInfo.getTime() / uploaderInfo.getTotal();
+        RateLimiter limiter = RateLimiter.create(_semaphore);
+
+        int _total = uploaderInfo.getTotal();
+        String path = uploaderInfo.getPath();
+        File file = new File(path);
+        if (!file.exists())
+        {
+            return BaseResponse.<EventResult>ok(new EventResult().ofMsg("文件或者文件夹不存在, path=" + path));
+        }
+        List<File> targetFileList = FileUtil.loopFiles(file);
+        if (targetFileList.size() == 0)
+        {
+            return BaseResponse.<EventResult>ok(new EventResult().ofMsg("文件数为0, path=" + path));
+        }
+        sftp.debug("{} 文件总数 = {}", path, _total);
+        long start = System.currentTimeMillis();
+
+        sftp.debug("总请求数量= {}", _total);
+        sftp.debug("每秒请求次数= {}", _semaphore);
+
+        List<CompletableFuture<Response>> futures = new ArrayList<>();
+        ExecutorService service = Executors.newFixedThreadPool(_total);
+
+        BlockingQueue<Long> ttimes = new LinkedBlockingQueue<>();
+        IntStream.range(0, _total).forEach(_i ->
+        {
+            int _index = _i >= targetFileList.size() ? _i % targetFileList.size() : _i;
+            System.out.println("sftp index - " + _index);
+            CompletableFuture<Response> future = CompletableFuture.supplyAsync(() ->
+            {
+                String id = null;
+                try
+                {
+                    limiter.acquire(1);
+                    long reqStart = System.currentTimeMillis();
+                    File data = targetFileList.get(_index);
+
+                    FtpRequest request = FtpRequest.upload()
+                            .file(new FileInfo(data.getName(), data.getPath()))
+                            .thenAnalyze().async().manager(new Callback())
+                            .build();
+                    Response ftp = SpinfoExecutor.create().uploadBigFile(request);
+                    return ftp;
+                }
+                catch (Exception e)
+                {
+                    Response r = new Response();
+                    r.setMessage(Collections.singletonMap("error", e.getMessage()));
+                    return r.id(e.getMessage() + "-" + counter.incrementAndGet()).status(405);
+                }
+            }, service);
+            futures.add(future);
+        });
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        List<Response> result = new ArrayList<>();
+        futures.forEach(f ->
+        {
+            try
+            {
+                result.add(f.get());
+            }
+            catch (InterruptedException | ExecutionException e)
+            {
+                e.printStackTrace();
+            }
+        });
+        long end = System.currentTimeMillis();
+        sftp.debug("总数" + _total + " 个请求, 每秒请求" + _semaphore + "个, 完成时间  = {}", end - start);
+
+        long success = result.stream().filter(r -> r.getStatus() == 200).count();
+        long failed = result.stream().filter(r -> r.getStatus() != 200).count();
+        result.stream().filter(r -> r.getStatus() != 200).forEach(rr -> sftp.debug("failed : " + rr.toString()));
+        sftp.debug("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个" + "\n");
         return BaseResponse.<EventResult>ok(new EventResult().ofMsg("成功的请求数量 = " + success + " 个, 失败的请求数量 = " + failed + " 个").ofUseTime(end - start));
     }
 
