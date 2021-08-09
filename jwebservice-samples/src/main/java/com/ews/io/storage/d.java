@@ -1,4 +1,4 @@
-package com.ews.io.structuredstorage;
+package com.ews.io.storage;
 
 final class d extends Number
 {

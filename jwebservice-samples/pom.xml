@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.play.jwebservice</groupId>
-    <artifactId>jwebservice</artifactId>
+    <groupId>com.play.ews</groupId>
+    <artifactId>ews-4-exchange</artifactId>
     <version>2.1-SNAPSHOT</version>
 
     <properties>
@@ -40,23 +40,27 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>2.9.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>2.9.1</version>
+            <scope>provided</scope>
         </dependency>
         <!--用于与slf4j保持桥接-->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>2.9.1</version>
+            <scope>provided</scope>
         </dependency>
         <!-- slf4j核心包-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.25</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -69,17 +73,25 @@
                     <groupId>javax.servlet</groupId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient-win</artifactId>
+            <version>4.5.3</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
+            <version>1.10</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

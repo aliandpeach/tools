@@ -1,6 +1,7 @@
 package com.ews.exchange;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 public class Body
 {

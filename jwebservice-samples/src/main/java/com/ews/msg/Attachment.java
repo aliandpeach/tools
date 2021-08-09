@@ -1,7 +1,17 @@
 package com.ews.msg;
 
-import com.ews.io.structuredstorage.*;
-import java.io.*;
+import com.ews.io.storage.Storage;
+import com.ews.io.storage.Stream;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class Attachment
 {

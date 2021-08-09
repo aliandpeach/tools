@@ -1,4 +1,4 @@
-package com.ews.io.structuredstorage;
+package com.ews.io.storage;
 
 public class RootDirectoryEntry extends DirectoryEntry
 {

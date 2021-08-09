@@ -1,9 +1,13 @@
 package com.ews.msg;
 
-import java.nio.charset.*;
-import java.nio.*;
-import java.util.*;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class ExtendedProperty
 {

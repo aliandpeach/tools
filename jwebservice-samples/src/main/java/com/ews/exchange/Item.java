@@ -1,11 +1,15 @@
 package com.ews.exchange;
 
-import java.util.*;
-import javax.xml.stream.*;
-import java.text.*;
-import java.nio.charset.*;
-import java.nio.*;
-import java.io.*;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class Item
 {

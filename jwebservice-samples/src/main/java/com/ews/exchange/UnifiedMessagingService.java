@@ -1,26 +1,65 @@
 package com.ews.exchange;
 
-import org.apache.http.conn.*;
-import org.apache.http.client.config.*;
-import org.apache.http.conn.ssl.*;
-import java.security.cert.*;
-import java.security.*;
-import org.apache.http.conn.socket.*;
-import org.apache.http.impl.conn.*;
-import java.util.logging.*;
-import java.util.*;
-import javax.net.ssl.*;
-import org.apache.http.entity.*;
-import org.apache.http.auth.*;
-import org.apache.http.impl.auth.*;
-import org.apache.http.config.*;
-import org.apache.http.client.methods.*;
-import java.net.*;
-import org.apache.http.client.*;
-import org.apache.http.impl.client.*;
-import javax.xml.stream.*;
-import org.apache.http.*;
-import java.io.*;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.NTCredentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.config.Lookup;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.auth.BasicSchemeFactory;
+import org.apache.http.impl.auth.DigestSchemeFactory;
+import org.apache.http.impl.auth.KerberosSchemeFactory;
+import org.apache.http.impl.auth.SPNegoSchemeFactory;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.URI;
+import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UnifiedMessagingService
 {
@@ -117,7 +156,7 @@ public class UnifiedMessagingService
     }
     
     private InputStream a(final String requestBody) throws Exception {
-        com.ews.exchange.b.a();
+//        com.ews.exchange.b.expiredValidate();
         if (!this.h) {
             String s = "<soap:Header>" + "<t:RequestServerVersion Version=\"" + com.ews.exchange.a.a(this.g) + "\"/>";
             if (this.e != null) {

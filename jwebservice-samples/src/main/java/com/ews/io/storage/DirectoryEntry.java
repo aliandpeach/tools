@@ -1,8 +1,11 @@
-package com.ews.io.structuredstorage;
+package com.ews.io.storage;
 
-import java.nio.charset.*;
-import java.nio.*;
-import java.util.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public abstract class DirectoryEntry implements Comparable<DirectoryEntry>
 {

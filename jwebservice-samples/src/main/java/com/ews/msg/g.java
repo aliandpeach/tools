@@ -1,6 +1,7 @@
 package com.ews.msg;
 
-import java.nio.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 final class g
 {

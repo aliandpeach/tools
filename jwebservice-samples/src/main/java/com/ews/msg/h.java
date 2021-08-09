@@ -1,10 +1,18 @@
 package com.ews.msg;
 
-import java.math.*;
-import java.nio.*;
-import java.nio.charset.*;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 final class h
 {

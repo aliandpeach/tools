@@ -1,6 +1,6 @@
-package com.ews.io.structuredstorage;
+package com.ews.io.storage;
 
-import java.io.*;
+import java.io.IOException;
 
 public class InvalidFileFormatException extends IOException
 {

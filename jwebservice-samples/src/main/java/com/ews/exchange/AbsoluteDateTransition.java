@@ -1,8 +1,9 @@
 package com.ews.exchange;
 
-import java.util.*;
-import javax.xml.stream.*;
-import java.text.*;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.text.ParseException;
+import java.util.Date;
 
 public class AbsoluteDateTransition extends Transition
 {

@@ -1,7 +1,14 @@
-package com.ews.io.structuredstorage;
+package com.ews.io.storage;
 
-import java.nio.*;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 public class Stream extends DirectoryEntry
 {

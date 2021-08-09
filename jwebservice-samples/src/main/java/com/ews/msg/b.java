@@ -1,6 +1,6 @@
 package com.ews.msg;
 
-import java.nio.charset.*;
+import java.nio.charset.Charset;
 
 final class b
 {

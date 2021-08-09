@@ -1,6 +1,6 @@
-package com.ews.io.structuredstorage;
+package com.ews.io.storage;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class DirectoryEntryList extends ArrayList<DirectoryEntry>
 {

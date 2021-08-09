@@ -1,8 +1,26 @@
-package com.ews.io.structuredstorage;
+package com.ews.io.storage;
 
-import java.util.*;
-import java.io.*;
-import java.nio.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
 
 public class CompoundFile
 {
@@ -249,7 +267,7 @@ public class CompoundFile
         final ArrayList<d> list3 = new ArrayList<d>();
         long n = 4294967294L;
         long n2 = 0L;
-        this.b.color = com.ews.io.structuredstorage.a.a;
+        this.b.color = com.ews.io.storage.a.a;
         this.b.type = DirectoryEntryType.ROOT;
         this.b.buffer = null;
         this.b.leftSiblingSid = new d(4294967295L);
@@ -483,11 +501,11 @@ public class CompoundFile
             Collections.sort(directoryEntry.directoryEntries);
             final int n = directoryEntry.directoryEntries.size() / 2;
             final DirectoryEntry directoryEntry2 = directoryEntry.directoryEntries.get(n);
-            if (directoryEntry.color == com.ews.io.structuredstorage.a.b) {
-                directoryEntry2.color = com.ews.io.structuredstorage.a.a;
+            if (directoryEntry.color == com.ews.io.storage.a.b) {
+                directoryEntry2.color = com.ews.io.storage.a.a;
             }
             else {
-                directoryEntry2.color = com.ews.io.structuredstorage.a.b;
+                directoryEntry2.color = com.ews.io.storage.a.b;
             }
             final DirectoryEntry directoryEntry3 = directoryEntry2;
             directoryEntry3.lastModifiedTime = date;
@@ -507,11 +525,11 @@ public class CompoundFile
             DirectoryEntry directoryEntry4 = directoryEntry2;
             for (int i = n - 1; i >= 0; --i) {
                 final DirectoryEntry directoryEntry5 = directoryEntry.directoryEntries.get(i);
-                if (directoryEntry.color == com.ews.io.structuredstorage.a.b) {
-                    directoryEntry5.color = com.ews.io.structuredstorage.a.a;
+                if (directoryEntry.color == com.ews.io.storage.a.b) {
+                    directoryEntry5.color = com.ews.io.storage.a.a;
                 }
                 else {
-                    directoryEntry5.color = com.ews.io.structuredstorage.a.b;
+                    directoryEntry5.color = com.ews.io.storage.a.b;
                 }
                 final DirectoryEntry directoryEntry6 = directoryEntry5;
                 directoryEntry6.lastModifiedTime = date;
@@ -535,11 +553,11 @@ public class CompoundFile
             DirectoryEntry directoryEntry7 = directoryEntry2;
             for (int j = n + 1; j < directoryEntry.directoryEntries.size(); ++j) {
                 final DirectoryEntry directoryEntry8 = directoryEntry.directoryEntries.get(j);
-                if (directoryEntry.color == com.ews.io.structuredstorage.a.b) {
-                    directoryEntry8.color = com.ews.io.structuredstorage.a.a;
+                if (directoryEntry.color == com.ews.io.storage.a.b) {
+                    directoryEntry8.color = com.ews.io.storage.a.a;
                 }
                 else {
-                    directoryEntry8.color = com.ews.io.structuredstorage.a.b;
+                    directoryEntry8.color = com.ews.io.storage.a.b;
                 }
                 final DirectoryEntry directoryEntry9 = directoryEntry8;
                 directoryEntry9.lastModifiedTime = date;

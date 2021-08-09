@@ -1,34 +1,84 @@
 package com.ews.exchange;
 
-import org.apache.http.conn.*;
-import org.apache.http.client.config.*;
-import org.apache.http.conn.ssl.*;
-import java.security.cert.*;
-import java.security.*;
-import org.apache.http.conn.socket.*;
-import org.apache.http.impl.conn.*;
+import com.ews.json.parser.JsonObject;
+import com.ews.json.parser.JsonParser;
+import com.ews.msg.ExtendedPropertyId;
+import com.ews.msg.ExtendedPropertyName;
+import com.ews.msg.ExtendedPropertyTag;
+import com.ews.msg.Recipient;
+import com.ews.msg.RecipientType;
+import com.ews.msg.RecurrenceType;
+import com.ews.msg.TaskDelegationState;
+import com.ews.msg.TaskOwnership;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.NTCredentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.WinHttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
+import java.net.URI;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
-import java.util.logging.*;
-import javax.net.ssl.*;
-import org.apache.http.entity.*;
-import org.apache.http.auth.*;
-import org.apache.http.impl.auth.*;
-import org.apache.http.config.*;
-import org.apache.http.client.*;
-import org.apache.http.client.methods.*;
-import java.util.zip.*;
-import java.net.*;
-import org.apache.http.impl.client.*;
-import org.apache.http.*;
-import com.ews.json.parser.*;
-import java.nio.charset.*;
-import java.nio.*;
-import javax.xml.stream.*;
-import java.text.*;
-import java.util.*;
-import com.ews.msg.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
 
 public class Service
 {
@@ -160,7 +210,7 @@ public class Service
     }
     
     private InputStream a(final String s, final boolean b) throws Exception {
-        com.ews.exchange.b.a();
+//        com.ews.exchange.b.expiredValidate();
         if (this.x != null && this.a != null && this.a.toLowerCase().startsWith("https://outlook.office365.com")) {
             final Calendar instance;
             (instance = Calendar.getInstance(Locale.getDefault())).add(13, -30);
@@ -254,19 +304,19 @@ public class Service
                     this.q = custom2.setDefaultCredentialsProvider((CredentialsProvider)defaultCredentialsProvider).build();
                 }
                 else {
-//                    final HttpClientBuilder custom3 = WinHttpClients.custom();
-//                    if (this.t != null) {
-//                        custom3.setProxy(this.t);
-//                    }
-//                    if (this.v != null) {
-//                        custom3.setDefaultRequestConfig(this.v);
-//                    }
-//                    if (this.u != null) {
-//                        custom3.setConnectionManager(this.u);
-//                    }
-//                    this.q = custom3.build();
+                    final HttpClientBuilder custom3 = WinHttpClients.custom();
+                    if (this.t != null) {
+                        custom3.setProxy(this.t);
+                    }
+                    if (this.v != null) {
+                        custom3.setDefaultRequestConfig(this.v);
+                    }
+                    if (this.u != null) {
+                        custom3.setConnectionManager(this.u);
+                    }
+                    this.q = custom3.build();
                 }
-                this.r = this.q.execute((HttpUriRequest)httpPost);
+                this.r = this.q.execute(httpPost);
                 final StatusLine statusLine;
                 if ((statusLine = this.r.getStatusLine()).getStatusCode() >= 300 && statusLine.getStatusCode() < 400) {
                     final Header[] headers;

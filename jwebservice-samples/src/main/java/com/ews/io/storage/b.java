@@ -1,8 +1,11 @@
-package com.ews.io.structuredstorage;
+package com.ews.io.storage;
 
-import java.io.*;
-import java.nio.*;
-import java.util.*;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 class b
 {

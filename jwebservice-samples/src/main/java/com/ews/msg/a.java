@@ -1,8 +1,13 @@
 package com.ews.msg;
 
-import java.io.*;
-import java.util.*;
-import java.text.*;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 class a
 {
@@ -1030,7 +1035,7 @@ class a
             final Date parse = new SimpleDateFormat("yyyy-MM-dd").parse("2021-12-31");
             final Date time = Calendar.getInstance().getTime();
             if (parse.before(time)) {
-                throw new IOException("JMSG 1.0 evaluation version, www.independentsoft.com. Evaluation version has expired.");
+                throw new IOException("JMSG 1.0 evaluation version. Evaluation version has expired.");
             }
             final File file = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".jms");
             boolean exists = false;
@@ -1041,9 +1046,9 @@ class a
                 final int value = Calendar.getInstance().get(5);
                 final int value2 = Calendar.getInstance().get(7);
                 if (value < 8 && value2 == 3) {
-                    System.out.println("JMSG 1.0 evaluation version, www.independentsoft.com. Please contact Independentsoft to obtain extended evaluation version jar file.");
-                    System.err.println("JMSG 1.0 evaluation version, www.independentsoft.com. Please contact Independentsoft to obtain extended evaluation version jar file.");
-                    throw new IOException("JMSG 1.0 evaluation version, www.independentsoft.com. Please contact Independentsoft to obtain extended evaluation version jar file.");
+                    System.out.println("JMSG 1.0 evaluation version. Please contact Independentsoft to obtain extended evaluation version jar file.");
+                    System.err.println("JMSG 1.0 evaluation version. Please contact Independentsoft to obtain extended evaluation version jar file.");
+                    throw new IOException("JMSG 1.0 evaluation version. Please contact Independentsoft to obtain extended evaluation version jar file.");
                 }
             }
             if (exists) {
@@ -1051,9 +1056,9 @@ class a
                 (instance = Calendar.getInstance()).setTime(new Date(file.lastModified()));
                 instance.add(2, 1);
                 if (instance.getTime().before(time)) {
-                    System.out.println("JMSG 1.0 evaluation version, www.independentsoft.com. Evaluation version has expired.");
-                    System.err.println("JMSG 1.0 evaluation version, www.independentsoft.com. Evaluation version has expired.");
-                    throw new IOException("JMSG 1.0 evaluation version, www.independentsoft.com. Evaluation version has expired.");
+                    System.out.println("JMSG 1.0 evaluation version. Evaluation version has expired.");
+                    System.err.println("JMSG 1.0 evaluation version. Evaluation version has expired.");
+                    throw new IOException("JMSG 1.0 evaluation version. Evaluation version has expired.");
                 }
             }
             else {
@@ -1064,17 +1069,17 @@ class a
                     final int value3 = Calendar.getInstance().get(5);
                     final int value4 = Calendar.getInstance().get(7);
                     if (value3 < 8 && value4 == 3) {
-                        System.out.println("JMSG 1.0 evaluation version, www.independentsoft.com. Please contact Independentsoft to obtain extended evaluation version jar file.");
-                        System.err.println("JMSG 1.0 evaluation version, www.independentsoft.com. Please contact Independentsoft to obtain extended evaluation version jar file.");
-                        throw new IOException("JMSG 1.0 evaluation version, www.independentsoft.com. Please contact Independentsoft to obtain extended evaluation version jar file.");
+                        System.out.println("JMSG 1.0 evaluation version. Please contact Independentsoft to obtain extended evaluation version jar file.");
+                        System.err.println("JMSG 1.0 evaluation version. Please contact Independentsoft to obtain extended evaluation version jar file.");
+                        throw new IOException("JMSG 1.0 evaluation version. Please contact Independentsoft to obtain extended evaluation version jar file.");
                     }
                 }
             }
         }
         catch (ParseException ex3) {
-            System.out.println("JMSG 1.0 evaluation version, www.independentsoft.com. Evaluation version has expired.");
-            System.err.println("JMSG 1.0 evaluation version, www.independentsoft.com. Evaluation version has expired.");
-            throw new IOException("JMSG 1.0 evaluation version, www.independentsoft.com. Evaluation version has expired.");
+            System.out.println("JMSG 1.0 evaluation version. Evaluation version has expired.");
+            System.err.println("JMSG 1.0 evaluation version. Evaluation version has expired.");
+            throw new IOException("JMSG 1.0 evaluation version. Evaluation version has expired.");
         }
     }
 }

@@ -1,10 +1,27 @@
 package com.ews.msg;
 
-import java.nio.charset.*;
-import java.nio.*;
-import java.util.*;
-import com.ews.io.structuredstorage.*;
-import java.io.*;
+import com.ews.io.storage.CompoundFile;
+import com.ews.io.storage.DirectoryEntry;
+import com.ews.io.storage.DirectoryEntryList;
+import com.ews.io.storage.Storage;
+import com.ews.io.storage.Stream;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class Message
 {

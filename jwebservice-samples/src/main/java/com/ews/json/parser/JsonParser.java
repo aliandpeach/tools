@@ -1,6 +1,8 @@
 package com.ews.json.parser;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 
 public class JsonParser
 {
