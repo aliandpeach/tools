@@ -30,17 +30,26 @@
  */
 package client;
 
-import java.util.*;
-import java.io.*;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.activation.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.activation.CommandMap;
+import javax.activation.MailcapCommandMap;
+import javax.mail.Folder;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
 import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.tree.*;
-import javax.swing.event.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Enumeration;
+import java.util.Vector;
 
 
 /**
@@ -66,6 +75,17 @@ public class SimpleClient
         System.setProperty("mail.imap.host", "imap.qq.com");
         System.setProperty("mail.imap.port", "143");
         System.setProperty("mail.imap.folder.class", "com.sun.mail.imap.IMAPFolder");
+
+        System.setProperty("proxySet","true");
+        System.setProperty("socksProxyHost","192.190.10.101");
+        System.setProperty("socksProxyPort","3128");
+
+
+//        System.setProperty("http.proxySet", "true");
+//        System.setProperty("http.proxyHost", "192.190.10.101");
+//        System.setProperty("http.proxyPort", "3128");
+//        System.setProperty("https.proxyHost", "192.190.10.101");
+//        System.setProperty("https.proxyPort", "3128");
 
         boolean usage = false;
 
