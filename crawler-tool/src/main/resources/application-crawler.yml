@@ -1,0 +1,60 @@
+spring:
+  autoconfigure:
+    exclude:
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  application:
+    name: crawler-tool
+  thymeleaf:
+    cache: false
+    enabled: true
+    prefix: classpath:/thymeleaf/
+    suffix: .html
+    mode: HTML
+    template-resolver-order: 1
+    encoding: UTF-8
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+      resolve-lazily: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/crawler-tool?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&mysqlEncoding=utf8&serverTimezone=UTC&useSSL=false&allowMultiQueries=true
+    username: ENC(skivFt3ountF9lG10v8UR8orBpjhNPXTog89C1Squ6F0vfWH4lCyYshVTij7ifW+)
+    password: ENC(91QeITZDM4Rj729HLoIesrEamShFqq2Qjeq4hEtHUxm+4P1/SF9nUiNHlYFodtpW)
+    hikari: # 使用hikari 连接池
+      maximumPoolSize: 15
+      minimumIdle: 5
+      idleTimeout: 30000
+      connectionTimeout: 30000
+      maxLifetime: 1800000
+      connectionTestQuery: SELECT 1
+      poolName: DatebookHikariCP
+      autoCommit: true
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    password:
+doge:
+  store-passwd: ENC(ZeMQwX7WMVja4AUrvoumDwaV/qRumK7JIBKDuizpyknb37sgufjVl/7dL7GfFFAvLUocas03rBDSlhDVk7fvKQ==)
+  key-passwd: ENC(8MI2MQPpZIva1guTh++5cRwg4knCjOzF6MQLbG1dDFj84tJk4yq17MmYj/uautGjCeu4x4L+OubC9xi3vrh4lw==)
+  # rsa-encrypted-1.pem
+  encrypted-passwd: ENC(8MI2MQPpZIva1guTh++5cRwg4knCjOzF6MQLbG1dDFj84tJk4yq17MmYj/uautGjCeu4x4L+OubC9xi3vrh4lw==)
+server:
+  port: 22913
+  servlet:
+    context-path: /
+    encoding:
+      force: true # HttpEncodingAutoConfiguration
+  ssl:
+    enabled: true
+    key-store: classpath:key/server.ks
+    key-password: ENC(oPr2Hfn1oCYZpTPX54bHItjn3EJTQsTyWA/d9WJjU8kZDXJYOSTWylUHm+InYJQy)
+    key-store-type: JKS
+    key-store-password: ENC(ZrdLzFBrafpelp40DapQKnjbaQBsNNbnIjwsN7pLMV4NJ4KeXbeW/Ecw5/9Xr9gO)
+    client-auth: NONE
+mybatis:
+  mapper-locations: classpath*:mappers/**/*.xml
+  type-aliases-package: com.tool.doge.model
+  # mybatis auto configuration get base packages by springboot, so you do not need to use @MapperScan

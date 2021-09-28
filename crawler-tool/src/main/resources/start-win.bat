@@ -1,0 +1,7 @@
+@echo off
+set "SAMPLE_CURRENT_PATH=%cd%"
+set "SAMPLE_JAR_PATH=%SAMPLE_CURRENT_PATH%\crawler-tool-1.0-SNAPSHOT.jar"
+set "SAMPLE_YML_PATH=%SAMPLE_CURRENT_PATH%\*.yml"
+set "SAMPLE_JAVA_EXEC_PATH=%SAMPLE_CURRENT_PATH%\jdk1.8.0_271\bin\java"
+
+%SAMPLE_JAVA_EXEC_PATH% -Xmx1024m -Xms64m -XX:ThreadStackSize=512 -jar "%SAMPLE_JAR_PATH%" --spring.config.location="%SAMPLE_YML_PATH%"

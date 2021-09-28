@@ -1,10 +1,17 @@
+import com.ews.exchange.Appointment;
+import com.ews.exchange.Contact;
 import com.ews.exchange.FindItemResponse;
-import com.ews.exchange.FolderPropertyPath;
+import com.ews.exchange.Identity;
 import com.ews.exchange.Item;
+import com.ews.exchange.ItemPropertyPath;
+import com.ews.exchange.ItemShape;
+import com.ews.exchange.Message;
+import com.ews.exchange.MimeContent;
 import com.ews.exchange.PropertyPath;
 import com.ews.exchange.RequestServerVersion;
 import com.ews.exchange.Service;
 import com.ews.exchange.ServiceException;
+import com.ews.exchange.ShapeType;
 import com.ews.exchange.StandardFolder;
 
 import java.util.ArrayList;
@@ -26,18 +33,24 @@ public class EwsMain
             Service service = new Service("https://192.168.37.104/ews/Exchange.asmx", "administrator", "Spinfo0123");
             service.setRequestServerVersion(RequestServerVersion.EXCHANGE_2007);
 
-//            Identity identity = new Identity();
-//            identity.setPrimarySmtpAddress("administrator@sp.exchange07.cn");
-//            service.setExchangeImpersonation(identity);
+//            HttpHost httpHost = new HttpHost("127.0.0.1", 8080);
+//            service.setProxy(httpHost);
 
-            List<PropertyPath> propertyPaths = new ArrayList<PropertyPath>();
-            propertyPaths.add(FolderPropertyPath.DISPLAY_NAME);
-            propertyPaths.add(FolderPropertyPath.FOLDER_CLASS);
-            propertyPaths.add(FolderPropertyPath.COMMENT);
+            Identity identity = new Identity();
+            identity.setPrimarySmtpAddress("test@sp.exchange07.cn");
+            service.setExchangeImpersonation(identity);
 
-            com.ews.exchange.FindFolderResponse findFolderResponse1 = service.findFolder(StandardFolder.ROOT);
+//            List<PropertyPath> propertyPaths = new ArrayList<PropertyPath>();
+//            propertyPaths.add(FolderPropertyPath.DISPLAY_NAME);
+//            propertyPaths.add(FolderPropertyPath.FOLDER_CLASS);
+//            propertyPaths.add(FolderPropertyPath.COMMENT);
+
+            // Item item1 = service.getItem("AAAeAEFkbWluaXN0cmF0b3JAc3AuZXhjaGFuZ2UwNy5jbgBGAAAAAADvOsoTy2vfR4e/wltmD8o+BwC7uOt78ZeXTK9lrEi+El1XAAACkCgiAAC7uOt78ZeXTK9lrEi+El1XAAACkDKMAAA=");
+
+//            FolderId folderId = new FolderId("AAAeAEFkbWluaXN0cmF0b3JAc3AuZXhjaGFuZ2UwNy5jbgAuAAAAAADvOsoTy2vfR4e/wltmD8o+AQC7uOt78ZeXTK9lrEi+El1XAAACkCgiAAA=");
+//            FindItemResponse response = service.findItem(folderId);
             com.ews.exchange.FindFolderResponse findFolderResponse2 = service.findFolder(StandardFolder.MAILBOX_ROOT);
-
+//            com.ews.exchange.FindFolderResponse findFolderResponse1 = service.findFolder(StandardFolder.ROOT);
             /*FolderView folderView = new FolderView(100, 0);
             PropertySet propertySet = new PropertySet(BasePropertySet.IdOnly);
             propertySet.add(FolderSchema.DisplayName);
@@ -52,42 +65,48 @@ public class EwsMain
                             folderView);
             List<Folder> folders = findFoldersResults.getFolders();*/
             //List first level mailbox folders
-            for (int i = 0; i < findFolderResponse1.getFolders().size(); i++)
-            {
-                System.out.println(findFolderResponse1.getFolders().get(i).getDisplayName());
-                System.out.println(findFolderResponse1.getFolders().get(i).getFolderId());
-            }
-
-            System.out.println("\n-------------------------------------------------------------------\n");
+//            for (int i = 0; i < findFolderResponse1.getFolders().size(); i++)
+//            {
+//                System.out.println(findFolderResponse1.getFolders().get(i).getDisplayName());
+//                System.out.println(findFolderResponse1.getFolders().get(i).getFolderId());
+//            }
+//
+//            System.out.println("\n-------------------------------------------------------------------\n");
 
             //List first level public folders
             for (int i = 0; i < findFolderResponse2.getFolders().size(); i++)
             {
-                System.out.println(findFolderResponse2.getFolders().get(i).getDisplayName());
-                System.out.println(findFolderResponse2.getFolders().get(i).getFolderId());
-                FindItemResponse findFolderResponse3 = service.findItem(findFolderResponse2.getFolders().get(i).getFolderId());
-                System.out.println(findFolderResponse3.getItems());
+//                System.out.println(findFolderResponse2.getFolders().get(i).getDisplayName());
+//                System.out.println(findFolderResponse2.getFolders().get(i).getFolderId().getId());
+                FindItemResponse findFolderResponse3 = service.findItem(findFolderResponse2.getFolders().get(i).getFolderId(), new ItemShape(ShapeType.ALL_PROPERTIES));
                 for (Item item : findFolderResponse3.getItems())
                 {
                     if (null == item)
                     {
                         continue;
                     }
+                    System.out.println("==========================================");
                     System.out.println(item.getSubject());
-                    System.out.println(item.getBody());
-                    if (item.getItemId().getId().startsWith("AAAeAEFkbWluaXN0cmF0b3JAc3AuZXhjaGFuZ2UwNy5jbgBGAAAAAADvOsoTy2vfR4e/wltmD8o+BwC7uOt78ZeXTK9lrEi+El1XAAACkCgfAAC7uOt78ZeXTK9lrEi+El1XAB3QHRyRAAA"))
-                    {
-                        System.out.println("");
-                    }
-                    System.out.println(item.getItemId());
+                    System.out.println(item.getSize());
+                    if (item instanceof Message)
+                        System.out.println(((Message) item).getReceivedTime());
+                    if (item instanceof Contact)
+                        System.out.println(((Contact) item).getCreatedTime());
+                    if (item instanceof Appointment)
+                        System.out.println(((Appointment) item).getCreatedTime());
+                    System.out.println(item.getItemClass());
+//                    System.out.println(((Message) item).getMimeContent().getText());
+//                    List<PropertyPath> propertyPaths = new ArrayList<>();
+//                    propertyPaths.add(ItemPropertyPath.MIME_CONTENT);
+//                    Item it = service.getItem(item.getItemId(), propertyPaths);
+//                    int s = it.getSize();
+//                    byte[] content = it.getMimeContent().getContent();
+                    System.out.println("==========================================");
                 }
             }
         }
         catch (ServiceException e)
         {
-            System.out.println(e.getMessage());
-            System.out.println(e.getXmlMessage());
-
             e.printStackTrace();
         }
     }

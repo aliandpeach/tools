@@ -8,6 +8,8 @@ public class MimeContent
 {
     private String a;
     private String b;
+
+    private byte[] content;
     
     public MimeContent() {
         this.b = "UTF-8";
@@ -36,7 +38,7 @@ public class MimeContent
             if (this.b == null) {
                 this.b = "UTF-8";
             }
-            this.a = Charset.forName(this.b).decode(ByteBuffer.wrap(d.e(elementText))).toString();
+            this.a = Charset.forName(this.b).decode(ByteBuffer.wrap((content = d.e(elementText)))).toString();
         }
         while (xmlStreamReader.hasNext() && (!xmlStreamReader.isEndElement() || xmlStreamReader.getLocalName() == null || xmlStreamReader.getNamespaceURI() == null || !xmlStreamReader.getLocalName().equals("MimeContent") || !xmlStreamReader.getNamespaceURI().equals("http://schemas.microsoft.com/exchange/services/2006/types"))) {
             xmlStreamReader.next();
@@ -72,5 +74,10 @@ public class MimeContent
     
     public void setCharacterSet(final String characterSet) {
         this.b = characterSet;
+    }
+
+    public byte[] getContent()
+    {
+        return content;
     }
 }

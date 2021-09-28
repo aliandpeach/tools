@@ -251,7 +251,8 @@ public class Service
                 s2 = s2 + "<t:DateTimePrecision>" + (((i = this.i) == DateTimePrecision.SECONDS) ? "Seconds" : ((i == DateTimePrecision.MILLISECONDS) ? "Milliseconds" : "None")) + "</t:DateTimePrecision>";
             }
             final StringEntity entity;
-            (entity = new StringEntity("<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"  xmlns:t=\"http://schemas.microsoft.com/exchange/services/2006/types\">" + (s2 + "</soap:Header>") + "<soap:Body>" + s + "</soap:Body>" + "</soap:Envelope>", "UTF-8")).setContentType("text/xml; charset=utf-8");
+            String entityString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"  xmlns:t=\"http://schemas.microsoft.com/exchange/services/2006/types\">" + (s2 + "</soap:Header>") + "<soap:Body>" + s + "</soap:Body>" + "</soap:Envelope>";
+            (entity = new StringEntity(entityString, "UTF-8")).setContentType("text/xml; charset=utf-8");
             int j = 1;
             while (j != 0) {
                 final URI uri = new URI(this.a);
@@ -1426,106 +1427,106 @@ public class Service
         if (o == null) {
             throw new IllegalArgumentException("items is null.");
         }
-        if (((List)o).size() == 0) {
+        if (o.size() == 0) {
             throw new IllegalArgumentException("itemId is not specified.");
         }
-        Label_0052: {
-            if (itemShape != null) {
-                break Label_0052;
-            }
+        if (itemShape == null) {
             itemShape = new ItemShape(ShapeType.ALL_PROPERTIES);
+        }
+//        itemShape.getPropertyPaths().add(ItemPropertyPath.MIME_CONTENT);
+        try {
+            if (this.g == RequestServerVersion.EXCHANGE_2007) {
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.EFFECTIVE_RIGHTS);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.UID);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.UID);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.UID);
+            }
+            if (this.g == RequestServerVersion.EXCHANGE_2007 || this.g == RequestServerVersion.EXCHANGE_2007_SP1) {
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.IS_ASSOCIATED);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.WEB_CLIENT_EDIT_FORM_QUERY_STRING);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.WEB_CLIENT_READ_FORM_QUERY_STRING);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.CONVERSATION_ID);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.UNIQUE_BODY);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.LAST_MODIFIED_TIME);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.LAST_MODIFIER_NAME);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.START_TIME_ZONE);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.END_TIME_ZONE);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.START_TIME_ZONE);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.END_TIME_ZONE);
+            }
+            if (this.g == RequestServerVersion.EXCHANGE_2007 || this.g == RequestServerVersion.EXCHANGE_2007_SP1 || this.g == RequestServerVersion.EXCHANGE_2010 || this.g == RequestServerVersion.EXCHANGE_2010_SP1 || this.g == RequestServerVersion.EXCHANGE_2010_SP2) {
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.STORE_ENTRY_ID);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.ALIAS);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.DIRECTORY_ID);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.DIRECT_REPORTS);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.MANAGER_MAILBOX);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.MS_EXCHANGE_CERTIFICATE);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.NOTES);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.PHONETIC_FULL_NAME);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.PHONETIC_FIRST_NAME);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.PHONETIC_LAST_NAME);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.PHOTO);
+                itemShape.getPropertyPaths().remove(ContactPropertyPath.USER_SMIME_CERTIFICATE);
+            }
+            if (this.g != RequestServerVersion.EXCHANGE_2013 && this.g != RequestServerVersion.EXCHANGE_2013_SP1 && this.g != RequestServerVersion.EXCHANGE_2016) {
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.FLAG);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.INSTANCE_KEY);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.RETENTION_TAG);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.ARCHIVE_TAG);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.RETENTION_DATE);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.PREVIEW);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.BLOCK_STATUS);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.HAS_BLOCKED_IMAGES);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.TEXT_BODY);
+                itemShape.getPropertyPaths().remove(ItemPropertyPath.ICON_INDEX);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.REMINDER_NEXT_TIME);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.START_WALL_CLOCK);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.END_WALL_CLOCK);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.ENHANCED_LOCATION);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.JOIN_ONLINE_MEETING_URL);
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.ONLINE_MEETING_SETTINGS);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.REMINDER_NEXT_TIME);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.START_WALL_CLOCK);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.END_WALL_CLOCK);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.ENHANCED_LOCATION);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.JOIN_ONLINE_MEETING_URL);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.ONLINE_MEETING_SETTINGS);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.CHANGE_HIGHLIGHTS);
+            }
+            if (this.g != RequestServerVersion.EXCHANGE_2007 && this.g != RequestServerVersion.EXCHANGE_2007_SP1) {
+                itemShape.getPropertyPaths().remove(AppointmentPropertyPath.MEETING_TIME_ZONE);
+                itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.MEETING_TIME_ZONE);
+            }
+            itemShape.getPropertyPaths().remove(ItemPropertyPath.NEXT_PREDICTED_ACTION);
+            itemShape.getPropertyPaths().remove(ItemPropertyPath.GROUPING_ACTION);
+            requestBody = "<GetItem xmlns=\"http://schemas.microsoft.com/exchange/services/2006/messages\" xmlns:t=\"http://schemas.microsoft.com/exchange/services/2006/types\">";
+            requestBody += itemShape.toString();
+            requestBody += "<ItemIds>";
+            for (int i = 0; i < (o).size(); ++i) {
+                requestBody += o.get(i).a();
+            }
+            requestBody += "</ItemIds>";
+            final String string;
+            requestBody = (string = requestBody + "</GetItem>");
+            itemInfoResponseList = d((this.a(string, true)), "GetItemResponseMessage");
+        }
+        catch (ServiceException ex) {
+            throw ex;
+        }
+        catch (Exception cause) {
+            throw new ServiceException(cause.getMessage(), cause, requestBody);
+        }
+        finally {
             try {
-                if (this.g == RequestServerVersion.EXCHANGE_2007) {
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.EFFECTIVE_RIGHTS);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.UID);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.UID);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.UID);
+                if (this.r != null) {
+                    this.r.close();
                 }
-                if (this.g == RequestServerVersion.EXCHANGE_2007 || this.g == RequestServerVersion.EXCHANGE_2007_SP1) {
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.IS_ASSOCIATED);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.WEB_CLIENT_EDIT_FORM_QUERY_STRING);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.WEB_CLIENT_READ_FORM_QUERY_STRING);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.CONVERSATION_ID);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.UNIQUE_BODY);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.START_TIME_ZONE);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.END_TIME_ZONE);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.START_TIME_ZONE);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.END_TIME_ZONE);
+                if (this.q != null && this.u == null) {
+                    this.q.close();
                 }
-                if (this.g == RequestServerVersion.EXCHANGE_2007 || this.g == RequestServerVersion.EXCHANGE_2007_SP1 || this.g == RequestServerVersion.EXCHANGE_2010 || this.g == RequestServerVersion.EXCHANGE_2010_SP1 || this.g == RequestServerVersion.EXCHANGE_2010_SP2) {
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.STORE_ENTRY_ID);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.ALIAS);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.DIRECTORY_ID);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.DIRECT_REPORTS);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.MANAGER_MAILBOX);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.MS_EXCHANGE_CERTIFICATE);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.NOTES);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.PHONETIC_FULL_NAME);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.PHONETIC_FIRST_NAME);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.PHONETIC_LAST_NAME);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.PHOTO);
-                    itemShape.getPropertyPaths().remove(ContactPropertyPath.USER_SMIME_CERTIFICATE);
-                }
-                if (this.g != RequestServerVersion.EXCHANGE_2013 && this.g != RequestServerVersion.EXCHANGE_2013_SP1 && this.g != RequestServerVersion.EXCHANGE_2016) {
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.FLAG);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.INSTANCE_KEY);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.RETENTION_TAG);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.ARCHIVE_TAG);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.RETENTION_DATE);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.PREVIEW);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.BLOCK_STATUS);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.HAS_BLOCKED_IMAGES);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.TEXT_BODY);
-                    itemShape.getPropertyPaths().remove(ItemPropertyPath.ICON_INDEX);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.REMINDER_NEXT_TIME);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.START_WALL_CLOCK);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.END_WALL_CLOCK);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.ENHANCED_LOCATION);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.JOIN_ONLINE_MEETING_URL);
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.ONLINE_MEETING_SETTINGS);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.REMINDER_NEXT_TIME);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.START_WALL_CLOCK);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.END_WALL_CLOCK);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.ENHANCED_LOCATION);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.JOIN_ONLINE_MEETING_URL);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.ONLINE_MEETING_SETTINGS);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.CHANGE_HIGHLIGHTS);
-                }
-                if (this.g != RequestServerVersion.EXCHANGE_2007 && this.g != RequestServerVersion.EXCHANGE_2007_SP1) {
-                    itemShape.getPropertyPaths().remove(AppointmentPropertyPath.MEETING_TIME_ZONE);
-                    itemShape.getPropertyPaths().remove(MeetingRequestPropertyPath.MEETING_TIME_ZONE);
-                }
-                itemShape.getPropertyPaths().remove(ItemPropertyPath.NEXT_PREDICTED_ACTION);
-                itemShape.getPropertyPaths().remove(ItemPropertyPath.GROUPING_ACTION);
-                requestBody = "<GetItem xmlns=\"http://schemas.microsoft.com/exchange/services/2006/messages\" xmlns:t=\"http://schemas.microsoft.com/exchange/services/2006/types\">";
-                requestBody += itemShape.toString();
-                requestBody += "<ItemIds>";
-                for (int i = 0; i < ((List)o).size(); ++i) {
-                    requestBody += ((List<ItemId>)o).get(i).a();
-                }
-                requestBody += "</ItemIds>";
-                final String string;
-                requestBody = (string = requestBody + "</GetItem>");
-                itemInfoResponseList = d((InputStream)(this.a(string, true)), "GetItemResponseMessage");
             }
-            catch (ServiceException ex) {
-                throw ex;
-            }
-            catch (Exception cause) {
-                throw new ServiceException(cause.getMessage(), cause, requestBody);
-            }
-            finally {
-                try {
-                    if (this.r != null) {
-                        this.r.close();
-                    }
-                    if (this.q != null && this.u == null) {
-                        this.q.close();
-                    }
-                }
-                catch (IOException cause2) {
-                    throw new ServiceException(cause2.getMessage(), cause2, requestBody);
-                }
+            catch (IOException cause2) {
+                throw new ServiceException(cause2.getMessage(), cause2, requestBody);
             }
         }
         if ((itemInfoResponseList).size() == 1 && ((itemInfoResponseList).get(0)).getResponseClass() == ResponseClass.ERROR) {
@@ -8707,7 +8708,7 @@ public class Service
     
     public InputStream getExportItemsInputStream(final ItemId itemId) throws ServiceException {
         final ArrayList<ItemId> list;
-        (list = new ArrayList<ItemId>()).add(itemId);
+        (list = new ArrayList<>()).add(itemId);
         return this.f(list);
     }
     
