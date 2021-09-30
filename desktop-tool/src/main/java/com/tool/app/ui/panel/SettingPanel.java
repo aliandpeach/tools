@@ -301,7 +301,7 @@ public class SettingPanel extends JPanel
                     advancedSettingPanel.setVisible(true);
                     advancedSetting = true;
 
-                    setContent();
+//                    setContent();
                 }
                 else
                 {

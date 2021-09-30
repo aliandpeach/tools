@@ -498,6 +498,18 @@ public class StatusPanel extends JPanel
                 if (chooser.showOpenDialog(clickPanel) == JFileChooser.APPROVE_OPTION)
                 {
                     File file = chooser.getSelectedFile();
+                    if (!file.exists() || !file.isFile())
+                    {
+                        return;
+                    }
+                    try
+                    {
+                        startTest(file.getCanonicalPath());
+                    }
+                    catch (IOException ioException)
+                    {
+                        ioException.printStackTrace();
+                    }
                 }
             }
 
@@ -872,13 +884,18 @@ public class StatusPanel extends JPanel
                                 String progress = response.getMessage().get("result");
                                 try
                                 {
-                                    int v = Integer.parseInt(progress);
-                                    v = Math.min(90, v);
+                                    int p = Integer.parseInt(progress);
+                                    int min = Math.min(90, p);
                                     int current = testProgress.getValue();
-                                    testProgress.setValue(Math.max(current, v));
+                                    testProgress.setValue(Math.max(current, min));
+                                    if (p == 100)
+                                    {
+                                        break;
+                                    }
                                 }
                                 catch (Exception e)
                                 {
+                                    e.printStackTrace();
                                 }
                             }
                         }
