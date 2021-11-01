@@ -10,6 +10,8 @@ import com.tool.app.ui.component.MyIconButton;
 import com.tool.app.util.ConfigManager;
 import com.tool.app.util.DESPlus;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -29,6 +31,8 @@ import java.util.Objects;
 public class SettingPanel extends JPanel
 {
     private static final long serialVersionUID = 1L;
+
+    private static final Logger logger = LoggerFactory.getLogger(SettingPanel.class);
 
     private static JTextField textFieldActivemqBrokerUrl;
     private static JTextField textFieldActivemqUsername;
@@ -495,6 +499,7 @@ public class SettingPanel extends JPanel
                 }
                 catch (Exception ex)
                 {
+                    logger.error("保存失败", ex);
                     JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.save.fail"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }

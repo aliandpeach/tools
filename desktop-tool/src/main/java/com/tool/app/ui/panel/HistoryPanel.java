@@ -172,7 +172,7 @@ public class HistoryPanel extends JPanel
                         pagePanel.setPage(page);
 
                         int index = 1;
-                        for (Map<String, Object> map : queryEventModel.getRowLost())
+                        for (Map<String, Object> map : queryEventModel.getRowList())
                         {
                             Task task = new Task();
                             task.setTaskId(Objects.isNull(map.get("taskId")) ? "" : map.get("taskId").toString());
@@ -197,7 +197,7 @@ public class HistoryPanel extends JPanel
 
     private static class QueryEventModel
     {
-        private java.util.List<Map<String, Object>> rowLost = new ArrayList<>();
+        private java.util.List<Map<String, Object>> rowList = new ArrayList<>();
 
         private int total;
 
@@ -207,14 +207,14 @@ public class HistoryPanel extends JPanel
 
         private String jobId;
 
-        public java.util.List<Map<String, Object>> getRowLost()
+        public java.util.List<Map<String, Object>> getRowList()
         {
-            return rowLost;
+            return rowList;
         }
 
-        public void setRowLost(List<Map<String, Object>> rowLost)
+        public void setRowList(List<Map<String, Object>> rowList)
         {
-            this.rowLost = rowLost;
+            this.rowList = rowList;
         }
 
         public int getTotal()

@@ -25,7 +25,7 @@ public class H2Store
 {
     private static final String H2_DUPLICATE_KEY_ERROR_CODE = "23505";
     private static final String DATABASE_DRIVER_CLASS = "org.h2.Driver";
-    private static final String DATABASE_CONNECTION_URL_PREFIX = "jdbc:h2:~/.dbsconfig/db/dbs";
+    private static final String DATABASE_CONNECTION_URL_PREFIX = "jdbc:h2:~/.dbsconfig/db/dbs-" + System.currentTimeMillis();
 
     private static final String USERNAME = "root";
     private static final char[] PASSWD = new char[]{'S', 'p', 'i', 'n', 'f', 'o', '@', '0', '1', '2', '3', '4',};
@@ -41,13 +41,13 @@ public class H2Store
             + ")";
     private static final String CREATE_EVENT_TABLE = "CREATE TABLE EVENT ( "
             + "id VARCHAR(64),"
-            + "file_name VARCHAR(1024),"
+            + "file_name VARCHAR(2048),"
             + "task_id VARCHAR(64),"
-            + "rule VARCHAR(256),"
+            + "rule VARCHAR(1024),"
             + "secret_rate VARCHAR(32),"
             + "sensitivity VARCHAR(32),"
             + "breach_content longtext,"
-            + "match_content VARCHAR(1024),"
+            + "match_content longtext,"
             + "event_create_date VARCHAR(32)"
             + ")";
 
