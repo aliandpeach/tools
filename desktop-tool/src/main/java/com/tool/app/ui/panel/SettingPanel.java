@@ -5,6 +5,7 @@ import com.spinfosec.connector.http.HttpRequest;
 import com.spinfosec.core.Response;
 import com.spinfosec.core.SpinfoExecutor;
 import com.tool.app.App;
+import com.tool.app.auth.ToolContext;
 import com.tool.app.ui.UiConsts;
 import com.tool.app.ui.component.MyIconButton;
 import com.tool.app.util.ConfigManager;
@@ -97,6 +98,7 @@ public class SettingPanel extends JPanel
 //        dbsSettingsPanel.setBorder(new TitledBorder(new EtchedBorder(), "DBS Server"));
         dbsHostPanel.setPreferredSize(new Dimension(400, 48));
         textFieldServerHost = new JTextField();
+        textFieldServerHost.setEditable(false);
         textFieldServerHost.setFont(UiConsts.FONT_NORMAL);
         textFieldServerHost.setPreferredSize(new Dimension(240, 28));
         JLabel dbsHost = new JLabel(App.resourceBundle.getString("label.setting.server.host"));

@@ -4,6 +4,7 @@ import com.tool.app.db.H2Store;
 import com.tool.app.ui.UiConsts;
 import com.tool.app.ui.panel.DetailPanel;
 import com.tool.app.ui.panel.HistoryPanel;
+import com.tool.app.ui.panel.LoginDialog;
 import com.tool.app.ui.panel.SettingPanel;
 import com.tool.app.ui.panel.StatusPanel;
 import com.tool.app.ui.panel.ToolBarPanel;
@@ -35,6 +36,8 @@ public class App
     public static HistoryPanel historyPanel;
 
     public static DetailPanel detailPanel;
+
+    public static LoginDialog loginDialog;
 
     public static H2Store h2Store;
 
@@ -125,6 +128,7 @@ public class App
             @Override
             public void windowOpened(WindowEvent e)
             {
+                loginDialog = new LoginDialog(main);
             }
 
             @Override

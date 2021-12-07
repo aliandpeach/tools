@@ -72,6 +72,7 @@ public class StatusPanel extends JPanel
     public static MyIconButton buttonStop;
 
     public static JProgressBar testProgress;
+    public static MyIconButton testProgressStopBtn;
 
     public static JPanel filePanel;
     public static JPanel clickPanel;
@@ -161,7 +162,7 @@ public class StatusPanel extends JPanel
         panelUp.add(comboBoxPanel);
 
         JPanel progressPanel = new JPanel();
-        progressPanel.setPreferredSize(new Dimension(460, 40));
+        progressPanel.setPreferredSize(new Dimension(380, 40));
         progressPanel.setBackground(Color.WHITE);
         progressPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 5));
 
@@ -170,7 +171,7 @@ public class StatusPanel extends JPanel
         testProgress = new JProgressBar();
 
         labelProgress.setPreferredSize(new Dimension(80, 30));
-        testProgress.setPreferredSize(new Dimension(380, 20));
+        testProgress.setPreferredSize(new Dimension(300, 20));
         testProgress.setBackground(Color.WHITE);
         testProgress.setForeground(Color.RED);
         testProgress.setStringPainted(true);
@@ -179,6 +180,14 @@ public class StatusPanel extends JPanel
         progressPanel.add(testProgress);
 
         panelUp.add(progressPanel);
+
+        JPanel progressBtnPanel = new JPanel();
+        progressBtnPanel.setPreferredSize(new Dimension(75, 30));
+        progressBtnPanel.setBackground(Color.WHITE);
+        progressBtnPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        testProgressStopBtn = new MyIconButton(UiConsts.ICON_STOP_PROGRESS, UiConsts.ICON_STOP_PROGRESS, UiConsts.ICON_STOP_PROGRESS, "");
+        progressBtnPanel.add(testProgressStopBtn);
+        panelUp.add(progressBtnPanel);
         return panelUp;
     }
 
@@ -535,6 +544,45 @@ public class StatusPanel extends JPanel
             public void mouseExited(MouseEvent e)
             {
                 clickPanel.setCursor(Cursor.getDefaultCursor());
+            }
+        });
+
+        testProgressStopBtn.addMouseListener(new MouseListener()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                if (null != currentRunningRequestId)
+                {
+                    SpinfoExecutor.create().removeWaiting(currentRunningRequestId);
+                    SpinfoExecutor.create().clearWaitingTask(currentRunningRequestId);
+                }
+                testProgress.setValue(0);
+                isRunning = false;
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e)
+            {
+                testProgressStopBtn.setCursor(Cursor.getDefaultCursor());
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e)
+            {
+                testProgressStopBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
         });
     }

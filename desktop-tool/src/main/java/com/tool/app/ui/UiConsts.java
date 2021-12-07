@@ -147,6 +147,13 @@ public class UiConsts
     public final static ImageIcon ICON_NEXT_PAGE = new ImageIcon(
             App.class.getResource("/icon/next_page.png"));
 
+    /**
+     * 进度停止
+     */
+    public final static ImageIcon ICON_STOP_PROGRESS = new ImageIcon(
+            App.class.getResource("/icon/dbs_stop.png"));
+
+
     // 样式布局相关
     /**
      * 主面板水平间隔
