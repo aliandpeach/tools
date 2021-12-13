@@ -72,6 +72,8 @@ public class ConstantsTools
     public final static String XPATH_SERVER_JOB_ID = "//dbs/server/job.id";
 
     public final static String XPATH_ADVANCED_SETTING = "//dbs/advanced/setting";
+    public final static String XPATH_USER_USERNAME = "//dbs/user/username";
+    public final static String XPATH_USER_PASSWORD = "//dbs/user/password";
 
     /**
      * 日志文件 路径

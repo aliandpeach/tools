@@ -3,6 +3,7 @@ package com.tool.app;
 import com.tool.app.db.H2Store;
 import com.tool.app.ui.UiConsts;
 import com.tool.app.ui.panel.DetailPanel;
+import com.tool.app.ui.panel.FailedPanel;
 import com.tool.app.ui.panel.HistoryPanel;
 import com.tool.app.ui.panel.LoginDialog;
 import com.tool.app.ui.panel.SettingPanel;
@@ -36,6 +37,7 @@ public class App
     public static HistoryPanel historyPanel;
 
     public static DetailPanel detailPanel;
+    public static FailedPanel failedPanel;
 
     public static LoginDialog loginDialog;
 
@@ -106,6 +108,7 @@ public class App
         settingPanel = new SettingPanel();
 
         detailPanel = new DetailPanel();
+        failedPanel = new FailedPanel();
 
         historyPanel = new HistoryPanel();
 

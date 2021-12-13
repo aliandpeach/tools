@@ -46,4 +46,14 @@ public class AuthResponseModel
     {
         this.message = message;
     }
+
+    @Override
+    public String toString()
+    {
+        return "AuthResponseModel{" +
+                "authorization=" + authorization +
+                ", state='" + state + '\'' +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

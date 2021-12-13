@@ -7,10 +7,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -51,6 +51,71 @@ public class EventView extends JPanel
 //        opacityFrame = new OpacityFrame();
 //        eventLabel = new JLabel();
 //        opacityFrame.add(eventLabel);
+
+        table.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0)
+                {
+                    Point point = e.getPoint();
+                    int rowIndex = table.rowAtPoint(point);
+                    int columnIndex = table.columnAtPoint(point);
+                    if (columnIndex == table.getColumnCount() - 1)
+                    {
+                        com.tool.app.db.Event event = Optional.ofNullable(eventModel.getRowList()).orElseGet(ArrayList::new).get(rowIndex);
+                        App.mainPanelCenter.removeAll();
+                        App.mainPanelCenter.add(App.detailPanel);
+                        App.mainPanelCenter.updateUI();
+                        PopTimingTip.getInstance().hideTipText();
+                        App.detailPanel.clearContent();
+
+                        String text = event.getBreachContent();
+                        String matchContent = event.getMatchContent();
+                        if (!StringUtils.isEmpty(matchContent))
+                        {
+                            for (String c : matchContent.split(";"))
+                            {
+                                if (!StringUtils.isNoneBlank(c))
+                                {
+                                    continue;
+                                }
+                                text = text.replace(c, "<span style=\"color: #ff5959;\">" + c + "</span>");
+                            }
+                        }
+
+                        App.detailPanel.setContent("<html><body><pre style=\"word-wrap: break-word;\">" + text + "</pre></body></html>", App.statusPanel);
+                    }
+                    if (columnIndex == table.getColumnCount() - 2)
+                    {
+                        com.tool.app.db.Event event = Optional.ofNullable(eventModel.getRowList()).orElseGet(ArrayList::new).get(rowIndex);
+                        App.mainPanelCenter.removeAll();
+                        App.mainPanelCenter.add(App.failedPanel);
+                        App.mainPanelCenter.updateUI();
+                        PopTimingTip.getInstance().hideTipText();
+                        App.failedPanel.clearContent();
+
+                        String text = event.getBreachContent();
+                        String matchContent = event.getMatchContent();
+                        if (!StringUtils.isEmpty(matchContent))
+                        {
+                            for (String c : matchContent.split(";"))
+                            {
+                                if (!StringUtils.isNoneBlank(c))
+                                {
+                                    continue;
+                                }
+                                text = text.replace(c, "<span style=\"color: #ff5959;\">" + c + "</span>");
+                            }
+                        }
+
+                        App.failedPanel.setContent("<html><body><pre style=\"word-wrap: break-word;\">" + (StringUtils.isEmpty(event.getFailedFiles()) ? "无" : event.getFailedFiles()) + "</pre></body></html>", App.statusPanel);
+                    }
+                }
+                super.mouseClicked(e);
+            }
+        });
 
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer()
         {
@@ -103,68 +168,6 @@ public class EventView extends JPanel
 
         });
 
-        table.addMouseListener(new MouseListener()
-        {
-            @Override
-            public void mouseClicked(MouseEvent e)
-            {
-                if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0)
-                {
-                    Point point = e.getPoint();
-                    int rowIndex = table.rowAtPoint(point);
-                    int columnIndex = table.columnAtPoint(point);
-                    if (columnIndex == table.getColumnCount() - 1)
-                    {
-                        com.tool.app.db.Event event = Optional.ofNullable(eventModel.getRowList()).orElseGet(ArrayList::new).get(rowIndex);
-                        App.mainPanelCenter.removeAll();
-                        App.mainPanelCenter.add(App.detailPanel);
-                        App.mainPanelCenter.updateUI();
-                        PopTimingTip.getInstance().hideTipText();
-                        App.detailPanel.clearContent();
-
-                        String text = event.getBreachContent();
-                        String matchContent = event.getMatchContent();
-                        if (!StringUtils.isEmpty(matchContent))
-                        {
-                            for (String c : matchContent.split(";"))
-                            {
-                                if (!StringUtils.isNoneBlank(c))
-                                {
-                                    continue;
-                                }
-                                text = text.replace(c, "<span style=\"color: #ff5959;\">" + c + "</span>");
-                            }
-                        }
-
-                        App.detailPanel.setContent("<html><body><pre style=\"word-wrap: break-word;\">" + text + "</pre></body></html>", App.statusPanel);
-                    }
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e)
-            {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e)
-            {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e)
-            {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e)
-            {
-
-            }
-        });
-
         table.addMouseMotionListener(new MouseMotionListener()
         {
             @Override
@@ -180,7 +183,8 @@ public class EventView extends JPanel
                 int rowIndex = table.rowAtPoint(point);
                 int columnIndex = table.columnAtPoint(point);
 
-                if (columnIndex == table.getColumnCount() - 1)
+                if (columnIndex == table.getColumnCount() - 1
+                        || columnIndex == table.getColumnCount() - 2)
                 {
                     table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 }
@@ -231,39 +235,63 @@ public class EventView extends JPanel
         scrollPane.setPreferredSize(new Dimension(800, 400));
         add(scrollPane);
 
-        scrollPane.addMouseListener(new MouseListener()
+        scrollPane.addMouseListener(new MouseAdapter()
         {
-            @Override
-            public void mouseClicked(MouseEvent e)
-            {
-
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e)
-            {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e)
-            {
-
-            }
-
             @Override
             public void mouseEntered(MouseEvent e)
             {
-                System.out.println("hideTipText1");
                 PopTimingTip.getInstance().hideTipText();
+                super.mouseEntered(e);
             }
 
             @Override
             public void mouseExited(MouseEvent e)
             {
                 PopTimingTip.getInstance().hideTipText();
-                System.out.println("hideTipText2");
+                super.mouseExited(e);
             }
         });
+    }
+
+    static class CellRenderer extends JPanel implements TableCellRenderer
+    {
+        private JButton detailBtn;
+
+        private JButton failedBtn;
+
+        public CellRenderer(JButton detailBtn, JButton failedBtn)
+        {
+            setOpaque(true);
+            this.detailBtn = detailBtn;
+            this.failedBtn = failedBtn;
+            init();
+        }
+
+        private void init()
+        {
+            setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            new JButton("事件详情");
+            add(detailBtn);
+            add(failedBtn);
+        }
+
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+                                                       int row, int column)
+        {
+            if (row % 2 == 0)
+            {
+                setBackground(new Color(236, 246, 248));
+            }
+            else
+            {
+                setBackground(new Color(255, 255, 255));
+            }
+
+            if (isSelected)
+            {
+                setBackground(new Color(154, 221, 151));
+            }
+            return this;
+        }
     }
 }

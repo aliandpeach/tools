@@ -1,24 +1,22 @@
 package com.tool.app.ui.panel;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.spinfosec.connector.http.HttpRequest;
+import com.spinfosec.core.JSONUtil;
 import com.spinfosec.core.Response;
 import com.spinfosec.core.SpinfoExecutor;
-import com.tool.app.App;
 import com.tool.app.db.Page;
 import com.tool.app.db.Task;
 import com.tool.app.ui.UiConsts;
-import com.tool.app.ui.component.MyIconButton;
 import com.tool.app.util.ConfigManager;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +30,8 @@ import java.util.concurrent.Executors;
  */
 public class HistoryPanel extends JPanel
 {
+    private static final Logger logger = LoggerFactory.getLogger(HistoryPanel.class);
+
     public static HistoryModel<Task> historyModel;
 
     public static HistoryView historyView;
@@ -154,16 +154,25 @@ public class HistoryPanel extends JPanel
                     params.put("pageSize", s);
 
                     java.util.List<Task> taskList = new ArrayList<>();
-                    HttpRequest httpRequest = HttpRequest.create()
+                    HttpRequest httpRequest = HttpRequest.<QueryEventModel>create()
                             .uri("/SIMP_DBS_S/event/file/analysis/query/event/page").method("POST").async()
                             .params(params).host(serverHost.startsWith("https://") ? serverHost : "https://" + serverHost).build();
                     Response response = SpinfoExecutor.create().execute(httpRequest);
-                    if (response.getStatus() == 200 && null != response.getMessage().get("result"))
+                    if (response.getStatus() == 200 && null != response.getHttpResult())
                     {
-                        String resultString = response.getMessage().get("result");
-                        QueryEventModel queryEventModel = JSON.parseObject(resultString, new TypeReference<QueryEventModel>()
+                        String result = response.getHttpResult();
+                        QueryEventModel queryEventModel = null;
+                        try
                         {
-                        });
+                            queryEventModel = JSONUtil.fromJson(result, new TypeReference<QueryEventModel>()
+                            {
+                            });
+                        }
+                        catch (IOException e)
+                        {
+                            logger.error("parse /query/event/page result error {}", result);
+                            return;
+                        }
 
                         Page<Task> page = new Page<>(
                                 queryEventModel.getTotal(),
@@ -187,7 +196,6 @@ public class HistoryPanel extends JPanel
                             task.setTestDate(Objects.isNull(map.get("detectDateTs")) ? "" : map.get("detectDateTs").toString());
                             taskList.add(task);
                         }
-                        System.out.println(queryEventModel);
                     }
                     historyModel.setRowList(taskList);
                 }
@@ -195,6 +203,7 @@ public class HistoryPanel extends JPanel
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class QueryEventModel
     {
         private java.util.List<Map<String, Object>> rowList = new ArrayList<>();

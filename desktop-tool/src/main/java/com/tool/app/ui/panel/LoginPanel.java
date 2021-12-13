@@ -1,5 +1,6 @@
 package com.tool.app.ui.panel;
 
+import com.tool.app.App;
 import com.tool.app.ui.UiConsts;
 import com.tool.app.util.ConfigManager;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +33,7 @@ public class LoginPanel extends JPanel
         lower.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
         lower.setPreferredSize(new Dimension(320, 130));
 
-        JLabel usernameLabel = new JLabel("用 户 名： ");
+        JLabel usernameLabel = new JLabel(App.resourceBundle.getString("ui.login.username"));
         usernameLabel.setFont(UiConsts.FONT_NORMAL);
         usernameLabel.setPreferredSize(new Dimension(70, 28));
         usernameField = new JTextField();
@@ -41,7 +42,7 @@ public class LoginPanel extends JPanel
         lower.add(usernameLabel);
         lower.add(usernameField);
 
-        JLabel passwordLabel = new JLabel("密      码： ");
+        JLabel passwordLabel = new JLabel(App.resourceBundle.getString("ui.login.password"));
         passwordLabel.setFont(UiConsts.FONT_NORMAL);
         passwordLabel.setPreferredSize(new Dimension(70, 28));
         pwdField = new JPasswordField();
@@ -50,7 +51,7 @@ public class LoginPanel extends JPanel
         lower.add(passwordLabel);
         lower.add(pwdField);
 
-        JLabel hostLabel = new JLabel("服务地址： ");
+        JLabel hostLabel = new JLabel(App.resourceBundle.getString("ui.login.host.server"));
         hostLabel.setFont(UiConsts.FONT_NORMAL);
         hostLabel.setPreferredSize(new Dimension(70, 28));
         hostField = new JTextField();

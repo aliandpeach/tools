@@ -24,6 +24,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -336,7 +337,7 @@ public class SettingPanel extends JPanel
                     JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.test.connect.error"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                HttpRequest httpRequest = HttpRequest.create()
+                HttpRequest httpRequest = HttpRequest.<Map<String, String>>create()
                         .uri("/SIMP_DBS_S/event/file/analysis/interface/job/list").method("GET").async()
                         .params(new HashMap<>()).host(serverHost.startsWith("https://") ? serverHost : "https://" + serverHost).build();
                 Response response = SpinfoExecutor.create().execute(httpRequest);

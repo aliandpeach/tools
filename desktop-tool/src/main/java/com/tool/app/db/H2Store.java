@@ -23,6 +23,9 @@ import java.util.UUID;
  */
 public class H2Store
 {
+    // 连接工具   Embedded: Path: ~/.dbsconfig/db/xxxxx.mv.db
+    //                     URL: jdbc:h2:~/.dbsconfig/db/xxxxx
+    //           Remote:  URL: jdbc:h2:tcp://localhost/~/.dbsconfig/db/xxxxx
     private static final String H2_DUPLICATE_KEY_ERROR_CODE = "23505";
     private static final String DATABASE_DRIVER_CLASS = "org.h2.Driver";
     private static final String DATABASE_CONNECTION_URL_PREFIX = "jdbc:h2:~/.dbsconfig/db/dbs-" + System.currentTimeMillis();
@@ -45,6 +48,7 @@ public class H2Store
             + "task_id VARCHAR(64),"
             + "rule VARCHAR(1024),"
             + "secret_rate VARCHAR(32),"
+            + "failed_files longtext,"
             + "sensitivity VARCHAR(32),"
             + "breach_content longtext,"
             + "match_content longtext,"
@@ -101,7 +105,7 @@ public class H2Store
     {
         Class.forName(DATABASE_DRIVER_CLASS);
         try (Connection conn = DriverManager.getConnection(DATABASE_CONNECTION_URL_PREFIX, USERNAME, new String(PASSWD));
-             PreparedStatement statement = conn.prepareStatement("INSERT INTO EVENT (`id`, `file_name`, `task_id`, `rule`, `secret_rate`, `sensitivity`, `breach_content`, `match_content`, `event_create_date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"))
+             PreparedStatement statement = conn.prepareStatement("INSERT INTO EVENT (`id`, `file_name`, `task_id`, `rule`, `secret_rate`, `sensitivity`, `breach_content`, `match_content`, `event_create_date`, `failed_files`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"))
         {
             for (Event event : eventList)
             {
@@ -114,6 +118,7 @@ public class H2Store
                 statement.setString(7, event.getBreachContent());
                 statement.setString(8, event.getMatchContent());
                 statement.setString(9, event.getEventCreateDate());
+                statement.setString(10, event.getFailedFiles());
                 statement.addBatch();
             }
             statement.executeBatch();
@@ -163,6 +168,7 @@ public class H2Store
                 event.setBreachContent(rs.getString("breach_content"));
                 event.setMatchContent(rs.getString("match_content"));
                 event.setEventCreateDate(rs.getString("event_create_date"));
+                event.setFailedFiles(rs.getString("failed_files"));
                 pageResult.getDataList().add(event);
             }
         }
