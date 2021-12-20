@@ -203,10 +203,10 @@ public class SdkBatchController implements InitializingBean
                     all.add(group);
                     if (result.getStatus() == 200)
                     {
-                        http_response.info("任务ID : " + result.getMessage().get("taskId"));
-                        http_response.info("任务结果状态 : " + result.getMessage().get("status"));
-                        http_response.info("任务失败文件列表 : " + result.getMessage().get("failedFiles"));
-                        http_response.info("任务事件信息 : " + result.getMessage().get("breachContent"));
+                        http_response.info("任务ID : " + result.getEventResult().get("taskId"));
+                        http_response.info("任务结果状态 : " + result.getEventResult().get("status"));
+                        http_response.info("任务失败文件列表 : " + result.getEventResult().get("failedFiles"));
+                        http_response.info("任务事件信息 : " + result.getEventResult().get("breachContent"));
                     }
                     return result;
                 }
@@ -391,17 +391,17 @@ public class SdkBatchController implements InitializingBean
                     all.add(group);
                     if (ftp.getStatus() == 200)
                     {
-                        sftp_response.info("任务ID : " + ftp.getMessage().get("taskId"));
-                        sftp_response.info("任务结果状态 : " + ftp.getMessage().get("status"));
-                        sftp_response.info("任务失败文件列表 : " + ftp.getMessage().get("failedFiles"));
-                        sftp_response.info("任务事件信息 : " + ftp.getMessage().get("breachContent"));
+                        sftp_response.info("任务ID : " + ftp.getEventResult().get("taskId"));
+                        sftp_response.info("任务结果状态 : " + ftp.getEventResult().get("status"));
+                        sftp_response.info("任务失败文件列表 : " + ftp.getEventResult().get("failedFiles"));
+                        sftp_response.info("任务事件信息 : " + ftp.getEventResult().get("breachContent"));
                     }
                     return ftp;
                 }
                 catch (Exception e)
                 {
                     Response r = new Response();
-                    r.setMessage(Collections.singletonMap("error", e.getMessage()));
+                    r.setEventResult(Collections.singletonMap("error", e.getMessage()));
                     return r.id(e.getMessage() + "-" + counter.incrementAndGet()).status(405);
                 }
             }, service);
@@ -496,7 +496,7 @@ public class SdkBatchController implements InitializingBean
                 catch (Exception e)
                 {
                     Response r = new Response();
-                    r.setMessage(Collections.singletonMap("error", e.getMessage()));
+                    r.setEventResult(Collections.singletonMap("error", e.getMessage()));
                     return r.id(e.getMessage() + "-" + counter.incrementAndGet()).status(405);
                 }
             }, service);
