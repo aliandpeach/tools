@@ -52,6 +52,7 @@ public class App
         {
             try
             {
+                java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
                 App window = new App();
                 main.setVisible(true);
             }
