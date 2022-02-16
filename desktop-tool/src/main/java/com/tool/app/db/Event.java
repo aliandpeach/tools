@@ -29,6 +29,8 @@ public class Event
 
     private String eventCreateDate;
 
+    private String failedFiles;
+
     public String getId()
     {
         return id;
@@ -127,5 +129,15 @@ public class Event
     public void setMatchContent(String matchContent)
     {
         this.matchContent = matchContent;
+    }
+
+    public String getFailedFiles()
+    {
+        return failedFiles;
+    }
+
+    public void setFailedFiles(String failedFiles)
+    {
+        this.failedFiles = failedFiles;
     }
 }

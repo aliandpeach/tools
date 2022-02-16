@@ -2,6 +2,7 @@ package com.tool.app.util;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
@@ -259,5 +260,43 @@ public class ConfigManager
     public void setAdvancedSetting(String setting)
     {
         this.document.selectSingleNode(ConstantsTools.XPATH_ADVANCED_SETTING).setText(setting);
+    }
+
+    public synchronized void setUsername(String username)
+    {
+        if (null == this.document.selectSingleNode("//dbs/user"))
+        {
+            this.document.getRootElement().addElement("user").addElement("username");
+        }
+        if (null == this.document.selectSingleNode("//dbs/user/username"))
+        {
+            ((Element) this.document.selectSingleNode("//dbs/user")).addElement("username");
+        }
+        this.document.selectSingleNode(ConstantsTools.XPATH_USER_USERNAME).setText(username);
+    }
+
+    public String getUsername()
+    {
+        return null == this.document.selectSingleNode(ConstantsTools.XPATH_USER_USERNAME) ? "" :
+                this.document.selectSingleNode(ConstantsTools.XPATH_USER_USERNAME).getText();
+    }
+
+    public synchronized void setPassword(String password)
+    {
+        if (null == this.document.selectSingleNode("//dbs/user"))
+        {
+            this.document.getRootElement().addElement("user").addElement("password");
+        }
+        if (null == this.document.selectSingleNode("//dbs/user/password"))
+        {
+            ((Element) this.document.selectSingleNode("//dbs/user")).addElement("password");
+        }
+        this.document.selectSingleNode(ConstantsTools.XPATH_USER_PASSWORD).setText(password);
+    }
+
+    public String getPassword()
+    {
+        return null == this.document.selectSingleNode(ConstantsTools.XPATH_USER_PASSWORD) ? "" :
+                this.document.selectSingleNode(ConstantsTools.XPATH_USER_PASSWORD).getText();
     }
 }

@@ -1,6 +1,7 @@
 package com.tool.app.ui.panel;
 
 import com.tool.app.db.Event;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -78,6 +79,8 @@ public class EventModel<T> extends AbstractTableModel
                 case 4:
                     return event.getBreachContent();
                 case 5:
+                    return StringUtils.isEmpty(event.getFailedFiles()) ? "无" : event.getFailedFiles();
+                case 6:
                     return "查看详情";
             }
         }
@@ -95,6 +98,7 @@ public class EventModel<T> extends AbstractTableModel
             case 3:
             case 4:
             case 5:
+            case 6:
                 return String.class;
             default:
                 return Object.class;

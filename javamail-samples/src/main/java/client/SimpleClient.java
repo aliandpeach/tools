@@ -76,9 +76,13 @@ public class SimpleClient
         System.setProperty("mail.imap.port", "143");
         System.setProperty("mail.imap.folder.class", "com.sun.mail.imap.IMAPFolder");
 
-        System.setProperty("proxySet","true");
-        System.setProperty("socksProxyHost","192.190.10.101");
-        System.setProperty("socksProxyPort","3128");
+        System.setProperty("proxySet", "true");
+        System.setProperty("mail.imap.proxy.host","192.190.10.101");
+        System.setProperty("mail.imap.proxy.port","3128");
+
+//        System.setProperty("proxySet","true");
+//        System.setProperty("socksProxyHost","192.190.10.101");
+//        System.setProperty("socksProxyPort","3128");
 
 
 //        System.setProperty("http.proxySet", "true");
@@ -86,6 +90,12 @@ public class SimpleClient
 //        System.setProperty("http.proxyPort", "3128");
 //        System.setProperty("https.proxyHost", "192.190.10.101");
 //        System.setProperty("https.proxyPort", "3128");
+
+        // 这个可以进行jvm的全局代理 包括http https tcp websocket
+        System.setProperty("proxyType", "4");
+        System.setProperty("proxyPort", "3128");
+        System.setProperty("proxyHost", "192.190.10.101");
+        System.setProperty("proxySet", "true");
 
         boolean usage = false;
 

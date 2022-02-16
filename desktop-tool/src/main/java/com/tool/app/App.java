@@ -3,7 +3,9 @@ package com.tool.app;
 import com.tool.app.db.H2Store;
 import com.tool.app.ui.UiConsts;
 import com.tool.app.ui.panel.DetailPanel;
+import com.tool.app.ui.panel.FailedPanel;
 import com.tool.app.ui.panel.HistoryPanel;
+import com.tool.app.ui.panel.LoginDialog;
 import com.tool.app.ui.panel.SettingPanel;
 import com.tool.app.ui.panel.StatusPanel;
 import com.tool.app.ui.panel.ToolBarPanel;
@@ -35,6 +37,9 @@ public class App
     public static HistoryPanel historyPanel;
 
     public static DetailPanel detailPanel;
+    public static FailedPanel failedPanel;
+
+    public static LoginDialog loginDialog;
 
     public static H2Store h2Store;
 
@@ -47,6 +52,7 @@ public class App
         {
             try
             {
+                java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
                 App window = new App();
                 main.setVisible(true);
             }
@@ -103,6 +109,7 @@ public class App
         settingPanel = new SettingPanel();
 
         detailPanel = new DetailPanel();
+        failedPanel = new FailedPanel();
 
         historyPanel = new HistoryPanel();
 
@@ -125,6 +132,7 @@ public class App
             @Override
             public void windowOpened(WindowEvent e)
             {
+                loginDialog = new LoginDialog(main);
             }
 
             @Override

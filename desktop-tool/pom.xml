@@ -91,7 +91,18 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.58</version>
+            <version>1.2.69</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.68</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>1.64</version>
         </dependency>
     </dependencies>
 
@@ -151,6 +162,11 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.bouncycastle:*:*:*</exclude>
+                                </excludes>
+                            </artifactSet>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>

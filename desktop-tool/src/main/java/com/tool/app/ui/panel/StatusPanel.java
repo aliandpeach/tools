@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.spinfosec.connector.http.HttpRequest;
 import com.spinfosec.connector.sftp.FtpRequest;
 import com.spinfosec.core.FileInfo;
+import com.spinfosec.core.JSONUtil;
 import com.spinfosec.core.Request;
 import com.spinfosec.core.Response;
 import com.spinfosec.core.SpinfoExecutor;
@@ -72,6 +73,7 @@ public class StatusPanel extends JPanel
     public static MyIconButton buttonStop;
 
     public static JProgressBar testProgress;
+    public static MyIconButton testProgressStopBtn;
 
     public static JPanel filePanel;
     public static JPanel clickPanel;
@@ -81,7 +83,7 @@ public class StatusPanel extends JPanel
     public static EventModel<Event> eventTableModel;
     public static EventView eventView;
 
-    public static final String[] EVENT_TABLE_COLUMN_NAMES = new String[]{"序号", "文件名称", "命中规则", "涉密概率", "匹配内容", "操作"};
+    public static final String[] EVENT_TABLE_COLUMN_NAMES = new String[]{"序号", "文件名称", "命中规则", "涉密概率", "匹配内容", "失败文件", "操作"};
 
     public static JComboBox<Item> jobComboBox;
 
@@ -161,7 +163,7 @@ public class StatusPanel extends JPanel
         panelUp.add(comboBoxPanel);
 
         JPanel progressPanel = new JPanel();
-        progressPanel.setPreferredSize(new Dimension(460, 40));
+        progressPanel.setPreferredSize(new Dimension(380, 40));
         progressPanel.setBackground(Color.WHITE);
         progressPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 5));
 
@@ -170,7 +172,7 @@ public class StatusPanel extends JPanel
         testProgress = new JProgressBar();
 
         labelProgress.setPreferredSize(new Dimension(80, 30));
-        testProgress.setPreferredSize(new Dimension(380, 20));
+        testProgress.setPreferredSize(new Dimension(300, 20));
         testProgress.setBackground(Color.WHITE);
         testProgress.setForeground(Color.RED);
         testProgress.setStringPainted(true);
@@ -179,6 +181,14 @@ public class StatusPanel extends JPanel
         progressPanel.add(testProgress);
 
         panelUp.add(progressPanel);
+
+        JPanel progressBtnPanel = new JPanel();
+        progressBtnPanel.setPreferredSize(new Dimension(75, 30));
+        progressBtnPanel.setBackground(Color.WHITE);
+        progressBtnPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        testProgressStopBtn = new MyIconButton(UiConsts.ICON_STOP_PROGRESS, UiConsts.ICON_STOP_PROGRESS, UiConsts.ICON_STOP_PROGRESS, "");
+        progressBtnPanel.add(testProgressStopBtn);
+        panelUp.add(progressBtnPanel);
         return panelUp;
     }
 
@@ -458,10 +468,20 @@ public class StatusPanel extends JPanel
                             return;
                         }
                         StatusPanel.comboBoxModel.removeAllElements();
-                        String result = response.getMessage().get("result");
-                        Map<String, String> resultBean = JSON.parseObject(Optional.ofNullable(result).orElse("{}"), new TypeReference<Map<String, String>>()
+                        String result = response.getHttpResult();
+                        Map<String, String> resultBean = null;
+                        try
                         {
-                        });
+                            resultBean = JSONUtil.fromJson(result, new com.fasterxml.jackson.core.type.TypeReference<Map<String, String>>()
+                            {
+                            });
+                        }
+                        catch (IOException ioException)
+                        {
+                            logger.error("parse /interface/job/list result error {}", result);
+                            JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.empty.or.null"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
                         resultBean.entrySet().stream()
                                 .map(t -> new Item(t.getKey(), t.getValue()))
                                 .collect(Collectors.toList())
@@ -535,6 +555,45 @@ public class StatusPanel extends JPanel
             public void mouseExited(MouseEvent e)
             {
                 clickPanel.setCursor(Cursor.getDefaultCursor());
+            }
+        });
+
+        testProgressStopBtn.addMouseListener(new MouseListener()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                if (null != currentRunningRequestId)
+                {
+                    SpinfoExecutor.create().removeWaiting(currentRunningRequestId);
+                    SpinfoExecutor.create().clearWaitingTask(currentRunningRequestId);
+                }
+                testProgress.setValue(0);
+                isRunning = false;
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e)
+            {
+                testProgressStopBtn.setCursor(Cursor.getDefaultCursor());
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e)
+            {
+                testProgressStopBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
         });
     }
@@ -623,16 +682,25 @@ public class StatusPanel extends JPanel
                 return;
             }
 
-            Map<String, String> message = response.getMessage();
-            if (Objects.isNull(message) || StringUtils.isEmpty(message.get("result")))
+            String result = response.getHttpResult();
+            if (Objects.isNull(result))
             {
                 JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.test.task.job.sftp.error"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String resultString = message.get("result");
-            Map<String, String> map = JSON.parseObject(resultString, new TypeReference<Map<String, String>>()
+            Map<String, String> map = null;
+            try
             {
-            });
+                map = JSONUtil.fromJson(result, new com.fasterxml.jackson.core.type.TypeReference<Map<String, String>>()
+                {
+                });
+            }
+            catch (IOException e)
+            {
+                logger.error("parse /job/target/info result error {}", result);
+                JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.test.task.job.sftp.error"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             String[] keys = new String[]{"IP", "USERNAME", "PASSWORD", "PORT"};
             Map<String, String> target = map.entrySet().stream()
                     .flatMap(t -> new HashMap<>(Collections.singletonMap(t.getKey(), des.decryptAes(t.getValue()))).entrySet().stream())
@@ -866,7 +934,7 @@ public class StatusPanel extends JPanel
                         }
                         Map<String, String> param = new HashMap<>();
                         param.put("taskId", requestId);
-                        HttpRequest httpRequest = HttpRequest.create()
+                        HttpRequest httpRequest = HttpRequest.<Integer>create()
                                 .uri("/SIMP_DBS_S/event/file/analysis/analyze/progress").method("GET").async()
                                 .params(param).build();
                         Response response = null;
@@ -879,9 +947,9 @@ public class StatusPanel extends JPanel
                         }
                         if (null != response && response.getStatus() == 200)
                         {
-                            if (null != response.getMessage().get("result"))
+                            if (null != response.getHttpResult())
                             {
-                                String progress = response.getMessage().get("result");
+                                String progress = response.getHttpResult();
                                 try
                                 {
                                     int p = Integer.parseInt(progress);
@@ -919,9 +987,9 @@ public class StatusPanel extends JPanel
                     }
                     if (result.getStatus() == 200)
                     {
-                        String status = result.getMessage().get("status");
-                        String breachContent = result.getMessage().get("breachContent");
-                        String failedFiles = result.getMessage().get("failedFiles");
+                        String status = result.getEventResult().get("status");
+                        String breachContent = result.getEventResult().get("breachContent");
+                        String failedFiles = result.getEventResult().get("failedFiles");
                         Task task = new Task();
                         task.setTaskId(requestId);
                         task.setJobId(jobId);
@@ -951,6 +1019,7 @@ public class StatusPanel extends JPanel
                                         ? !Objects.isNull(event.get("externalBreachContent")) ? event.get("externalBreachContent").toString() : ""
                                         : event.get("breachContent").toString());
                                 dbEvent.setMatchContent(Objects.isNull(event.get("matchContent")) ? "" : event.get("matchContent").toString());
+                                dbEvent.setFailedFiles(Objects.isNull(failedFiles) ? "" : failedFiles);
                                 dbEvents.add(dbEvent);
                             }
                             testProgress.setValue(95);
@@ -960,9 +1029,9 @@ public class StatusPanel extends JPanel
                     }
                     else
                     {
-                        String msg = Objects.isNull(result.getMessage()) || Objects.isNull(result.getMessage().get("result"))
+                        String msg = Objects.isNull(result.getHttpResult())
                                 ? "后台检测错误"
-                                : result.getMessage().get("result");
+                                : result.getHttpResult();
                         JOptionPane.showMessageDialog(App.settingPanel, msg, App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
                     }
                 }

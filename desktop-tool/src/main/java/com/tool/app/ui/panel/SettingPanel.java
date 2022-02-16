@@ -5,6 +5,7 @@ import com.spinfosec.connector.http.HttpRequest;
 import com.spinfosec.core.Response;
 import com.spinfosec.core.SpinfoExecutor;
 import com.tool.app.App;
+import com.tool.app.auth.ToolContext;
 import com.tool.app.ui.UiConsts;
 import com.tool.app.ui.component.MyIconButton;
 import com.tool.app.util.ConfigManager;
@@ -23,6 +24,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -97,6 +99,7 @@ public class SettingPanel extends JPanel
 //        dbsSettingsPanel.setBorder(new TitledBorder(new EtchedBorder(), "DBS Server"));
         dbsHostPanel.setPreferredSize(new Dimension(400, 48));
         textFieldServerHost = new JTextField();
+        textFieldServerHost.setEditable(false);
         textFieldServerHost.setFont(UiConsts.FONT_NORMAL);
         textFieldServerHost.setPreferredSize(new Dimension(240, 28));
         JLabel dbsHost = new JLabel(App.resourceBundle.getString("label.setting.server.host"));
@@ -334,7 +337,7 @@ public class SettingPanel extends JPanel
                     JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.test.connect.error"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                HttpRequest httpRequest = HttpRequest.create()
+                HttpRequest httpRequest = HttpRequest.<Map<String, String>>create()
                         .uri("/SIMP_DBS_S/event/file/analysis/interface/job/list").method("GET").async()
                         .params(new HashMap<>()).host(serverHost.startsWith("https://") ? serverHost : "https://" + serverHost).build();
                 Response response = SpinfoExecutor.create().execute(httpRequest);
