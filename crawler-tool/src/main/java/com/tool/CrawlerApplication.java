@@ -32,7 +32,7 @@ public class CrawlerApplication extends SpringBootServletInitializer
     }
 
     @Bean
-    public ServletWebServerFactory thymeleafContainerInitializer(ServerProperties serverProperties)
+    public ServletWebServerFactory crawlerContainerInitializer(ServerProperties serverProperties)
     {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory()
         {

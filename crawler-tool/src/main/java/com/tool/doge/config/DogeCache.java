@@ -1,4 +1,4 @@
-package com.tool.doge;
+package com.tool.doge.config;
 
 import java.util.List;
 

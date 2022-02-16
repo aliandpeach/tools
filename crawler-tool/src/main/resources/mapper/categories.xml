@@ -1,0 +1,23 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tool.doge.mapper.ICategoriesTypeMapper">
+
+    <insert id="saveCategoriesTypeList" parameterType="com.tool.doge.model.CategoriesType">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO CATEGORIES_TYPE
+                (`id`, `categories_uuid`,`categories_name`, `categories_url`) values (#{id}, #{item.uuid}, #{item.name}, #{item.url})
+        </foreach>
+    </insert>
+
+    <insert id="saveCategoriesType" parameterType="com.tool.doge.model.CategoriesType">
+        INSERT INTO CATEGORIES_TYPE
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `categories_uuid`,`categories_name`, `categories_url`
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{uuid}, #{name}, #{url}
+        </trim>
+    </insert>
+    <select id="selectCategoriesTypeList" resultType="com.tool.doge.model.CategoriesType">
+        SELECT * FROM CATEGORIES_TYPE
+    </select>
+</mapper>

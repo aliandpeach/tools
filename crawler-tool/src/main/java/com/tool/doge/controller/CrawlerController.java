@@ -1,4 +1,4 @@
-package com.tool.crawler.controller;
+package com.tool.doge.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class CrawlerController implements InitializingBean
     private static Random random = new Random();
 
     @Override
-    public void afterPropertiesSet() throws Exception
+    public void afterPropertiesSet()
     {
     }
 

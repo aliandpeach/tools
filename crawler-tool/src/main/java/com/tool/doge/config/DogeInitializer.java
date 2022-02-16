@@ -1,20 +1,23 @@
-package com.tool.doge;
+package com.tool.doge.config;
 
-import com.tool.doge.service.HostService;
+import com.tool.doge.config.DogeProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 
 /**
  * 描述
  */
+@Configuration
 public class DogeInitializer implements ServletContextInitializer
 {
-    @Override
-    public void onStartup(ServletContext servletContext) throws ServletException
-    {
+    @Autowired
+    private DogeProperties dogeProperties;
 
+    @Override
+    public void onStartup(ServletContext servletContext)
+    {
     }
 }

@@ -4,6 +4,7 @@ import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.EnvironmentPBEConfig;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -35,5 +36,20 @@ public class JasptyTest
 
         String _plainText = standardPBEStringEncryptor.decrypt(encryptedText);
         System.out.println(_plainText);
+    }
+
+    @Test
+    public void encrypt()
+    {
+        StandardPBEStringEncryptor standardPBEStringEncryptor = new StandardPBEStringEncryptor();
+        EnvironmentPBEConfig config = new EnvironmentPBEConfig();
+        config.setAlgorithm("PBEWithMD5AndDES");
+        config.setPassword("2umJALPv+htYoMK9iKXuSJjh90dXbjSD");
+        standardPBEStringEncryptor.setConfig(config);
+        String plainText = "4Cou8ka8UH3l%qgF";
+        String encryptedText = standardPBEStringEncryptor.encrypt(plainText);
+        System.out.println(encryptedText);
+        String uniqueTaskId = UUID.randomUUID().toString();
+        System.out.println(uniqueTaskId);
     }
 }

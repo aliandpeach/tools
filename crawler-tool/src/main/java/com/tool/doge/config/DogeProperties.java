@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "doge")
 @Data
-public class DogeConfig
+public class DogeProperties
 {
     private String downloadPath = System.getProperty("user.home");
 
