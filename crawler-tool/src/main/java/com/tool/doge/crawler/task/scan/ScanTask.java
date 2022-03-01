@@ -3,7 +3,6 @@ package com.tool.doge.crawler.task.scan;
 import com.tool.doge.config.Constants;
 import com.tool.doge.config.DogeProperties;
 import com.tool.doge.crawler.task.AbstractTask;
-import com.tool.doge.model.DownloadCategories;
 import com.tool.doge.model.DownloadScan;
 import com.tool.doge.model.DownloadType;
 import com.tool.doge.service.HostService;
@@ -18,12 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
