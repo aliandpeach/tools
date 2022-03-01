@@ -5,6 +5,7 @@ import com.tool.doge.config.DogeProperties;
 import com.tool.doge.crawler.task.AbstractTask;
 import com.tool.doge.model.DownloadCategories;
 import com.tool.doge.model.DownloadScan;
+import com.tool.doge.model.DownloadType;
 import com.tool.doge.service.HostService;
 import com.yk.crypto.RSA2048Util;
 import com.yk.httprequest.HttpClientUtil;
@@ -89,28 +90,28 @@ public class ScanTask extends AbstractTask
         }
     }
 
-    public String executeScanWeb(String host, String url, int retry, List<DownloadScan> list)
+    public String executeScanWeb(String host, DownloadType downloadType, int retry, List<DownloadScan> list)
     {
-        logger.info("executeScanWeb url = " + url);
+        logger.info("executeScanWeb url = " + downloadType.getUrl());
         String results = null;
         try
         {
-            results = httpClientUtil.getString(host + url, Constants.HEADERS, null);
+            results = httpClientUtil.getString(host + downloadType.getUrl(), Constants.HEADERS, null);
             if (null == results)
             {
-                logger.error("executeScanWeb results is null url = " + url);
-                return executeScanWeb(host, url, ++retry, list);
+                logger.error("executeScanWeb results is null url = " + downloadType.getUrl());
+                return executeScanWeb(host, downloadType, ++retry, list);
             }
         }
         catch (RuntimeException e)
         {
-            logger.error("RuntimeException executeScanWeb results is null url = " + url);
-            return executeScanWeb(host, url, ++retry, list);
+            logger.error("RuntimeException executeScanWeb results is null url = " + downloadType.getUrl());
+            return executeScanWeb(host, downloadType, ++retry, list);
         }
         catch (Exception e)
         {
-            logger.error("Exception executeScanWeb results is null url = " + url);
-            return executeScanWeb(host, url, ++retry, list);
+            logger.error("Exception executeScanWeb results is null url = " + downloadType.getUrl());
+            return executeScanWeb(host, downloadType, ++retry, list);
         }
         _sleep(15000);
         Document doc = null;

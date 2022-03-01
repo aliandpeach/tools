@@ -1,9 +1,7 @@
 package com.tool.doge.crawler.task.scan;
 
-import com.tool.doge.config.DogeException;
-import com.tool.doge.model.CategoriesType;
-import com.tool.doge.model.DownloadCategories;
 import com.tool.doge.model.DownloadScan;
+import com.tool.doge.model.DownloadType;
 import com.tool.doge.model.Host;
 import com.tool.doge.service.DownloaderService;
 import com.tool.doge.service.HostService;
@@ -15,8 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -50,10 +46,11 @@ public class ScanCenter
 
         crawlerScheduled.scheduleWithFixedDelay(() ->
         {
+            DownloadType downloadType = new DownloadType();
             for (Host host : hosts)
             {
                 List<DownloadScan> list = new ArrayList<>();
-                String result = scanTask.executeScanWeb(host.getName(), "", 0, list);
+                scanTask.executeScanWeb(host.getName(), downloadType, 0, list);
                 if (list.size() > 0)
                 {
                     break;

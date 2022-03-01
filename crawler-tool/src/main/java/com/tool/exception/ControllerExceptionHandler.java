@@ -126,7 +126,6 @@ public class ControllerExceptionHandler
         BaseResponse<?> baseResponse = handleBaseException(e);
         HttpStatus status = HttpStatus.BAD_GATEWAY;
         baseResponse.setStatus(status.value());
-        baseResponse.setStatus(status.value());
         baseResponse.setMessage(status.getReasonPhrase());
         return baseResponse;
     }
@@ -142,11 +141,11 @@ public class ControllerExceptionHandler
     }
 
     @ExceptionHandler(CrawlerException.class)
-    public BaseResponse<?> sdkException(CrawlerException e)
+    public BaseResponse<?> crawlerException(CrawlerException e)
     {
         BaseResponse<Object> baseResponse = handleBaseException(e);
         baseResponse.setStatus(e.getStatus());
-        baseResponse.setData(e.getMessage());
+        baseResponse.setMessage(e.getMessage());
         return baseResponse;
     }
 
@@ -156,7 +155,6 @@ public class ControllerExceptionHandler
     {
         BaseResponse<?> baseResponse = handleBaseException(e);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        baseResponse.setStatus(status.value());
         baseResponse.setStatus(status.value());
         baseResponse.setMessage(status.getReasonPhrase());
         return baseResponse;
@@ -188,13 +186,10 @@ public class ControllerExceptionHandler
         BaseResponse<T> baseResponse = new BaseResponse<>();
         baseResponse.setMessage(t.getMessage());
 
-//        logger.error("Captured an exception:", t);
-
         if (logger.isDebugEnabled())
         {
             baseResponse.setMessage(getStackTrace(t));
         }
-
         return baseResponse;
     }
 

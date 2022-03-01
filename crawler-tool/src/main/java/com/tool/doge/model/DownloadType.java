@@ -1,8 +1,5 @@
 package com.tool.doge.model;
 
-import com.yk.httprequest.JSONUtil;
-
-import java.io.IOException;
 import java.io.Serializable;
 
 public class DownloadType implements Serializable
@@ -11,9 +8,7 @@ public class DownloadType implements Serializable
 
     private String type;
 
-    private String originalUrl;
-
-    private String latestUrl;
+    private String url;
 
     public String getType()
     {
@@ -25,36 +20,13 @@ public class DownloadType implements Serializable
         this.type = type;
     }
 
-    public String getOriginalUrl()
+    public String getUrl()
     {
-        return originalUrl;
+        return url;
     }
 
-    public void setOriginalUrl(String originalUrl)
+    public void setUrl(String url)
     {
-        this.originalUrl = originalUrl;
-    }
-
-    public String getLatestUrl()
-    {
-        return latestUrl;
-    }
-
-    public void setLatestUrl(String latestUrl)
-    {
-        this.latestUrl = latestUrl;
-    }
-
-    @Override
-    public String toString()
-    {
-        try
-        {
-            return JSONUtil.toJson(this);
-        }
-        catch (IOException e)
-        {
-            return "{}";
-        }
+        this.url = url;
     }
 }

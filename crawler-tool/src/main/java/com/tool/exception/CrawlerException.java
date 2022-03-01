@@ -2,10 +2,12 @@ package com.tool.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 异常类
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 public class CrawlerException extends RuntimeException
@@ -22,17 +24,27 @@ public class CrawlerException extends RuntimeException
 
     public CrawlerException(String message, int status, Throwable e)
     {
-
         super(e);
+        this.status = status;
+        this.message = message;
     }
 
     public CrawlerException(String message, Throwable e)
     {
         super(e);
+        this.message = message;
+    }
+
+    public CrawlerException(String message, int status)
+    {
+        super();
+        this.status = status;
+        this.message = message;
     }
 
     public CrawlerException(String message)
     {
         super();
+        this.message = message;
     }
 }

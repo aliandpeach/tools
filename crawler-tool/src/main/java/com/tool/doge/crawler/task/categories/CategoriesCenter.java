@@ -1,12 +1,12 @@
 package com.tool.doge.crawler.task.categories;
 
-import com.tool.doge.config.DogeException;
 import com.tool.doge.model.CategoriesType;
 import com.tool.doge.model.DownloadCategories;
 import com.tool.doge.model.Host;
 import com.tool.doge.service.CategoriesTypeService;
 import com.tool.doge.service.DownloaderService;
 import com.tool.doge.service.HostService;
+import com.tool.exception.CrawlerException;
 import com.yk.crypto.RSA2048Util;
 import com.yk.httprequest.HttpClientUtil;
 import org.slf4j.Logger;
@@ -73,7 +73,7 @@ public class CategoriesCenter
         catch (InterruptedException | ExecutionException e)
         {
             logger.error("search categories error {}", e.getMessage());
-            throw new DogeException("ERROR", e);
+            throw new CrawlerException("ERROR", e);
         }
 
         AtomicInteger integer = new AtomicInteger(0);
