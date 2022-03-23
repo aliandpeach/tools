@@ -3,13 +3,14 @@ package com.tool.doge.model;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 public class DownloadScan implements Serializable
 {
     private static final long serialVersionUID = -8323664616301391119L;
 
-    private String id;
+    private String id = UUID.randomUUID().toString().replace("-", "");
 
     private String url;
 
@@ -17,9 +18,7 @@ public class DownloadScan implements Serializable
 
     private String fileHash;
 
-    private String fileLabel;
-
-    private String fileType;
+    private String category;
 
     private boolean success;
 }

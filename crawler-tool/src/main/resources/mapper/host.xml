@@ -2,6 +2,10 @@
 <mapper namespace="com.tool.doge.mapper.IHostMapper">
 
     <select id="selectHostList" resultType="com.tool.doge.model.Host">
-        SELECT * FROM  c_host;
+        SELECT * FROM  download_host;
     </select>
+
+    <insert id="save" parameterType="com.tool.doge.model.Host">
+        INSERT INTO download_host (`name`) VALUES (#{name, jdbcType=VARCHAR});
+    </insert>
 </mapper>

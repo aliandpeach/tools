@@ -3,7 +3,8 @@ package com.tool.doge.crawler.task.scan;
 import com.tool.doge.model.DownloadScan;
 import com.tool.doge.model.DownloadType;
 import com.tool.doge.model.Host;
-import com.tool.doge.service.DownloaderService;
+import com.tool.doge.model.Scan;
+import com.tool.doge.service.DownloadScanService;
 import com.tool.doge.service.HostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,43 +33,41 @@ public class ScanCenter
     private ScanTask scanTask;
 
     @Autowired
-    private DownloaderService downloaderService;
+    private DownloadScanService downloadScanService;
 
     @Autowired
     private HostService hostService;
 
-    public void crawler()
+    public void crawler(List<Host> hosts)
     {
-        List<Host> hosts = hostService.queryHostList();
-
         AtomicInteger integer = new AtomicInteger(0);
         ScheduledExecutorService crawlerScheduled = Executors.newScheduledThreadPool(5, r -> new Thread(r, "scan-crawler-" + integer.getAndIncrement()));
 
         crawlerScheduled.scheduleWithFixedDelay(() ->
         {
-            DownloadType downloadType = new DownloadType();
+            Scan scan = new Scan();
             for (Host host : hosts)
             {
                 List<DownloadScan> list = new ArrayList<>();
-                scanTask.executeScanWeb(host.getName(), downloadType, 0, list);
+                scanTask.executeScanWeb(host.getName(), scan, 0, list);
                 if (list.size() > 0)
                 {
                     break;
                 }
-                downloaderService.saveDownloadScanList(list);
+                downloadScanService.saveDownloadScanList(list);
             }
         }, 0, 5, TimeUnit.SECONDS);
     }
 
-    public void download()
+    public void download(List<Host> hosts)
     {
         AtomicInteger integer = new AtomicInteger(0);
-        ScheduledExecutorService downloadScheduled = Executors.newScheduledThreadPool(5, r -> new Thread(r, "scan-download-" + integer.getAndIncrement()));
+        ScheduledExecutorService downloadScheduled = Executors.newScheduledThreadPool(2, r -> new Thread(r, "scan-download-" + integer.getAndIncrement()));
         downloadScheduled.scheduleWithFixedDelay(() ->
         {
             try
             {
-                consumer(hostService.queryHostList());
+                consumer(hosts);
             }
             catch (Exception e)
             {
@@ -88,7 +87,7 @@ public class ScanCenter
         }, 0, 5, TimeUnit.SECONDS);
     }
 
-    public void consumer(List<Host> hosts)
+    private void consumer(List<Host> hosts)
     {
         DownloadScan downloadScan = null;
         synchronized (LOCK)
@@ -133,7 +132,7 @@ public class ScanCenter
             }
         }
 
-        downloaderService.updateDownloadScan(downloadScan);
+        downloadScanService.updateDownloadScan(downloadScan);
 
         try
         {
@@ -151,7 +150,7 @@ public class ScanCenter
         }
     }
 
-    public void producer()
+    private void producer()
     {
         synchronized (LOCK)
         {
@@ -171,7 +170,7 @@ public class ScanCenter
             }
         }
 
-        List<DownloadScan> downloadScanList = downloaderService.selectDownloadScan(20);
+        List<DownloadScan> downloadScanList = downloadScanService.selectDownloadScan(20);
         Optional.ofNullable(downloadScanList).orElse(new ArrayList<>()).forEach(t -> DOWNLOAD_SCAN_QUEUE.offer(t));
         logger.info("producer offer : " + Thread.currentThread().getName() + " queue size " + DOWNLOAD_SCAN_QUEUE.size());
         synchronized (LOCK)

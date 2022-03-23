@@ -6,9 +6,9 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Data
-public class DownloadType implements Serializable
+public class DownloadLabel implements Serializable
 {
     private String id = UUID.randomUUID().toString().replace("-", "");
 
-    private String typeName;
+    private String labelName;
 }

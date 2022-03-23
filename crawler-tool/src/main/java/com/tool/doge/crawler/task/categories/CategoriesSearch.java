@@ -1,11 +1,12 @@
 package com.tool.doge.crawler.task.categories;
 
 import com.tool.doge.config.Constants;
-import com.tool.doge.model.CategoriesType;
+import com.tool.doge.model.Category;
 import com.tool.doge.model.Host;
 import com.tool.doge.service.HostService;
 import com.yk.crypto.RSA2048Util;
 import com.yk.httprequest.HttpClientUtil;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,9 +25,9 @@ import java.util.Set;
 @Service
 public class CategoriesSearch
 {
-    private static final Logger logger = LoggerFactory.getLogger("categories");
+    private static final Logger logger = LoggerFactory.getLogger("crawler");
 
-    private static final String ARG = "categories";
+    private static final String CATEGORIES = "categories";
 
     @Autowired
     private HttpClientUtil httpClientUtil;
@@ -36,39 +38,40 @@ public class CategoriesSearch
     @Autowired
     private HostService hostService;
 
-    public List<CategoriesType> search(List<Host> hosts)
+    public List<Category> search(List<Host> hosts)
     {
-        Set<CategoriesType> types = new HashSet<>();
+        Set<Category> result = new HashSet<>();
         for (Host host : hosts)
         {
-            CategoriesType type = getCategories(host.getName());
-            if (null == type)
+            Set<Category> types = getCategories(host.getName());
+            if (null == types || types.size() == 0)
             {
                 continue;
             }
-            types.add(type);
+            result.addAll(types);
         }
-        return new ArrayList<>(types);
+        return new ArrayList<>(result);
     }
 
     /**
      * 获取所有分类
      */
-    public CategoriesType getCategories(String host)
+    public Set<Category> getCategories(String host)
     {
+        Set<Category> categoriesList = new HashSet<>();
         String page;
         try
         {
-            page = httpClientUtil.getString(host + ARG + "/", Constants.HEADERS, null);
+            page = httpClientUtil.getString(host + CATEGORIES + "/", Constants.HEADERS, null);
         }
         catch (RuntimeException e)
         {
-            logger.info("RuntimeException CategoriesSearch results is null url = ");
+            logger.error("RuntimeException CategoriesSearch results is null")                                                ;
             return null;
         }
         catch (Exception e)
         {
-            logger.info("Exception executeScanWeb results is null url = ");
+            logger.error("Exception executeScanWeb results is null");
             return null;
         }
 
@@ -111,9 +114,10 @@ public class CategoriesSearch
             logger.info("something is wrong!!4");
             return null;
         }
-        CategoriesType categoriesType = new CategoriesType();
+
         for (Element ele : e2)
         {
+            Category category = new Category();
             Element _hrefA = ele.selectFirst("a");
             String _href = _hrefA.attr("href");
             String _title = _hrefA.attr("title");
@@ -124,15 +128,17 @@ public class CategoriesSearch
             }
             try
             {
-                categoriesType.setName(rsa2048Util.decrypt(_title));
+                category.setName(DigestUtils.sha256Hex(_title.getBytes(StandardCharsets.UTF_8)));
             }
             catch (Exception e)
             {
                 logger.error("decrypt error {}", e.getMessage());
                 continue;
             }
-            categoriesType.setUrl(_href.replace(host, ""));
+            category.setUrl(_href.replace(host, ""));
+            category.setUuid(category.getUrl().substring(category.getUrl().indexOf(CATEGORIES + "/") + (CATEGORIES + "/").length(), category.getUrl().length() - 1));
+            categoriesList.add(category);
         }
-        return categoriesType;
+        return categoriesList;
     }
 }

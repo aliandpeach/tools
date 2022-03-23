@@ -1,7 +1,7 @@
 package com.tool.doge.mapper;
 
+import com.tool.doge.model.Category;
 import com.tool.doge.model.DownloadCategories;
-import com.tool.doge.model.DownloadScan;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import java.util.List;
  *
  * @author yangk
  * @version 1.0
- * @since 2022/02/09 12:03:53
+ * @since 2022/02/08 11:01:36
  */
-public interface IDownloaderMapper
+public interface IDownloadCategoriesMapper
 {
     int saveDownloadCategories(DownloadCategories downloadCategories);
 
@@ -22,11 +22,13 @@ public interface IDownloaderMapper
 
     List<DownloadCategories> selectDownloadCategories(int limit);
 
-    int saveDownloadScan(DownloadScan downloadScan);
+    int saveCategoryList(List<Category> categoryList);
 
-    int saveDownloadScanList(List<DownloadScan> downloadScanList);
+    int saveCategory(Category category);
 
-    int updateDownloadScan(DownloadScan downloadScan);
+    List<Category> selectCategoryList();
 
-    List<DownloadScan> selectDownloadScan(int limit);
+    int updateLatestUrlByType(String type, String latestUrl);
+
+    int updateLatestPageByType(int page, String latestUrl);
 }

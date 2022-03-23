@@ -50,15 +50,15 @@ public class DogeAop
     }
 
     @Around(value = "pointcutConfig()")
-    public void aroundMethod(ProceedingJoinPoint joinPoint) throws Throwable
+    public Object aroundMethod(ProceedingJoinPoint joinPoint) throws Throwable
     {
         List<Host> hostList = hostService.queryHostList();
-        List<String> hosts = Optional.ofNullable(hostList).orElseGet(ArrayList::new)
+        List<Host> hosts = Optional.ofNullable(hostList).orElseGet(ArrayList::new)
                 .stream().map(t ->
                 {
                     try
                     {
-                        return rsa2048Util.decrypt(t.getName());
+                        return new Host(t.getId(), rsa2048Util.decrypt(t.getName()));
                     }
                     catch (Exception e)
                     {
@@ -67,5 +67,6 @@ public class DogeAop
                     }
                 }).filter(Objects::nonNull).collect(Collectors.toList());
         HOST_LIST.set(hosts);
+        return joinPoint.proceed();
     }
 }

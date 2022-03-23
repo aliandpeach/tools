@@ -1,0 +1,62 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tool.doge.mapper.IDownloadCategoriesMapper">
+
+    <insert id="saveDownloadCategories" parameterType="com.tool.doge.model.DownloadCategories">
+        INSERT INTO download_categories
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `id`, `url`,`file_name`, `file_hash`, `category`, `success`
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{item.id}, #{url}, #{fileName}, #{fileHash}, #{category}, #{success,jdbcType=BOOLEAN}
+        </trim>
+    </insert>
+    <insert id="saveDownloadCategoriesList" parameterType="com.tool.doge.model.DownloadCategories">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO download_categories
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                `id`, `url`,`file_name`, `file_hash`, `category`, `success`
+            </trim>
+            <trim prefix=" SELECT " suffix="" suffixOverrides=",">
+                #{item.id}, #{item.url}, #{item.fileName}, #{item.fileHash}, #{item.category}, #{item.success,jdbcType=BOOLEAN}
+            </trim>
+            WHERE NOT EXISTS (SELECT url FROM download_categories WHERE url = #{item.url})
+        </foreach>
+    </insert>
+
+    <update id="updateDownloadCategories" parameterType="com.tool.doge.model.DownloadCategories">
+        UPDATE download_categories
+        <set>
+            <if test="success != null" >
+                success = #{success,jdbcType=BOOLEAN},
+            </if>
+        </set>
+        WHERE id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectDownloadCategories" parameterType="java.lang.Integer">
+        SELECT * FROM download_categories
+        <where>success = false</where>
+        LIMIT #{limit}
+    </select>
+
+    <!--##########################################################################-->
+    <insert id="saveCategoryList" parameterType="com.tool.doge.model.Category">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO CATEGORIES
+                (`id`, `categories_uuid`,`categories_name`, `categories_url`) values (#{id}, #{item.uuid}, #{item.name}, #{item.url})
+        </foreach>
+    </insert>
+
+    <insert id="saveCategory" parameterType="com.tool.doge.model.Category">
+        INSERT INTO CATEGORIES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `categories_uuid`,`categories_name`, `categories_url`
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{uuid}, #{name}, #{url}
+        </trim>
+    </insert>
+    <select id="selectCategoryList" resultType="com.tool.doge.model.Category">
+        SELECT * FROM CATEGORIES
+    </select>
+</mapper>

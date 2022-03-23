@@ -18,9 +18,7 @@ public class DownloadCategories implements Serializable
 
     private String fileHash;
 
+    private String category;
+
     private boolean success;
-
-    private String fileLabel;
-
-    private String fileType;
 }

@@ -1,10 +1,15 @@
 package com.tool.base.config;
 
+import com.ulisesbocchio.jasyptspringboot.EncryptablePropertySource;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -15,6 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 @EnableAsync
 @MapperScan("com.tool.doge.mapper")
+@EnableTransactionManagement
 public class BaseConfiguration
 {
     @Bean
@@ -28,5 +34,11 @@ public class BaseConfiguration
         executor.setThreadNamePrefix("thread-execute-");//线程名称前缀
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());//设置拒绝策略
         return executor;
+    }
+
+    @Bean
+    public EnvCopy baseEnvCopy(ConfigurableEnvironment environment)
+    {
+        return new EnvCopy(environment);
     }
 }

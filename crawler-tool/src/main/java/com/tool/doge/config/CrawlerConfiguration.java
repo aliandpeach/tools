@@ -17,6 +17,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 
 /**
  * 描述
@@ -45,13 +47,17 @@ public class CrawlerConfiguration
         {
             PrivateKey key = KeyUtil.readEncryptedKey(DogeAop.class.getClassLoader().getResourceAsStream("key/rsa-encrypted-1.pem"),
                     dogeProperties.getEncryptedPasswd());
-            PublicKey pub = KeyUtil.exportPublickey(key);
+            PublicKey pub = KeyUtil.exportPublicKey(key);
+            PublicKey publicKey = KeyUtil.readCertificate(DogeAop.class.getClassLoader().getResourceAsStream("key/rsa.pub"));
+            byte[] bytes1 = publicKey.getEncoded();
+            byte[] bytes2 = pub.getEncoded();
+            boolean equals = Arrays.equals(bytes1, bytes2);
             RSA2048Util rsa = RSA2048Util.getInstance(key.getEncoded(), pub.getEncoded());
             return rsa;
         }
         catch (Exception e)
         {
-            logger.error("init RSA2048Util bean error {}", e.getMessage());
+            logger.error("init RSA2048Util bean error", e);
             return null;
         }
     }

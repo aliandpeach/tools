@@ -4,13 +4,13 @@ import cn.hutool.core.util.NumberUtil;
 import com.tool.doge.config.Constants;
 import com.tool.doge.config.DogeProperties;
 import com.tool.doge.crawler.task.AbstractTask;
-import com.tool.doge.model.CategoriesType;
+import com.tool.doge.model.Category;
 import com.tool.doge.model.DownloadCategories;
 import com.tool.doge.model.Host;
-import com.tool.doge.service.CategoriesTypeService;
 import com.tool.doge.service.HostService;
 import com.yk.crypto.RSA2048Util;
 import com.yk.httprequest.HttpClientUtil;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,10 +29,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CategoriesTask extends AbstractTask
 {
-    private static final Logger logger = LoggerFactory.getLogger("categories");
-
-    @Autowired
-    private CategoriesTypeService categoriesTypeService;
+    private static final Logger logger = LoggerFactory.getLogger("crawler");
 
     @Autowired
     private HttpClientUtil httpClientUtil;
@@ -64,33 +61,33 @@ public class CategoriesTask extends AbstractTask
         }
     }
 
-    public String executeCategoriesWeb(String host, CategoriesType categoriesType, List<DownloadCategories> list, int retry)
+    public String executeCategoriesWeb(String host, Category category, List<DownloadCategories> list, int retry)
     {
         if (retry > 3)
         {
             return null;
         }
         logger.info("executeCategoriesWeb retry times = {} ", retry);
-        logger.info("executeCategoriesWeb url = " + categoriesType.getUrl());
+        logger.info("executeCategoriesWeb url = " + category.getUrl());
         String results = null;
         try
         {
-            results = httpClientUtil.getString(host + categoriesType.getUrl(), Constants.HEADERS, null);
+            results = httpClientUtil.getString(host + category.getUrl(), Constants.HEADERS, null);
             if (null == results)
             {
-                logger.error("executeCategoriesWeb results is null url = " + categoriesType.getUrl());
-                return executeCategoriesWeb(host, categoriesType, list, ++retry);
+                logger.error("executeCategoriesWeb results is null url = " + category.getUrl());
+                return executeCategoriesWeb(host, category, list, ++retry);
             }
         }
         catch (RuntimeException e)
         {
-            logger.error("RuntimeException executeCategoriesWeb results is null url = " + categoriesType.getUrl());
-            return executeCategoriesWeb(host, categoriesType, list, ++retry);
+            logger.error("RuntimeException executeCategoriesWeb results is null url = " + category.getUrl());
+            return executeCategoriesWeb(host, category, list, ++retry);
         }
         catch (Exception e)
         {
-            logger.error("Exception executeCategoriesWeb results is null url = " + categoriesType.getUrl());
-            return executeCategoriesWeb(host, categoriesType, list, ++retry);
+            logger.error("Exception executeCategoriesWeb results is null url = " + category.getUrl());
+            return executeCategoriesWeb(host, category, list, ++retry);
         }
         _sleep(12000);
         Document doc = null;
@@ -129,6 +126,7 @@ public class CategoriesTask extends AbstractTask
 
         for (Element ele : e2)
         {
+            DownloadCategories downloadCategories = new DownloadCategories();
             if (null == ele)
             {
                 continue;
@@ -143,8 +141,10 @@ public class CategoriesTask extends AbstractTask
                 continue;
             }
             r = r.replace(host, "");
-//            list.add()
-            break;
+            downloadCategories.setUrl(r);
+            downloadCategories.setFileName(DigestUtils.sha256Hex(name));
+            downloadCategories.setCategory(category.getUuid());
+            list.add(downloadCategories);
         }
         String nextUrl = nextUrl(doc);
         logger.info("next url : " + nextUrl);
@@ -277,7 +277,7 @@ public class CategoriesTask extends AbstractTask
         e = es.first();
         if (e == null)
         {
-            logger.error("nextUrl es is null e = " + e);
+            logger.error("nextUrl es is null e ");
             return null;
         }
         String str = e.html();
@@ -306,7 +306,7 @@ public class CategoriesTask extends AbstractTask
         try
         {
             String rootDir = dogeProperties.getDownloadPath();
-            sha256 = httpClientUtil.getBytes(host + downloadCategories.getUrl(), Constants.HEADERS, null, finalName, downloadCategories.getFileType(), rootDir);
+            sha256 = httpClientUtil.getBytes(host + downloadCategories.getUrl(), Constants.HEADERS, null, finalName, downloadCategories.getCategory(), rootDir);
             if (null == sha256)
             {
                 logger.error("execute download results is false url = " + downloadCategories.getUrl());
@@ -331,13 +331,13 @@ public class CategoriesTask extends AbstractTask
         return true;
     }
 
-    public List<DownloadCategories> categoriesPage(Host host, CategoriesType categoriesType)
+    public List<DownloadCategories> categoriesPage(Host host, Category category)
     {
         List<DownloadCategories> list = new ArrayList<>();
-        String url = categoriesType.getUrl() + "?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=%d&_=" + Instant.now().toEpochMilli();
-        url = String.format(url, categoriesType.getPage());
+        String url = category.getUrl() + "?mode=async&function=get_block&block_id=list_videos_common_videos_list&sort_by=post_date&from=%d&_=" + Instant.now().toEpochMilli();
+        url = String.format(url, category.getPage().get());
         logger.info("categories page url : {}", url);
-        String nextPage = this.executeCategoriesWeb(host.getName(), categoriesType, list, 0);
+        String nextPage = this.executeCategoriesWeb(host.getName(), category, list, 0);
         logger.info("categories next page : {}", nextPage);
         if (null == nextPage || !NumberUtil.isInteger(nextPage))
         {
@@ -345,7 +345,7 @@ public class CategoriesTask extends AbstractTask
         }
         else
         {
-            categoriesType.setPage(Integer.parseInt(nextPage));
+            category.addPage(Integer.parseInt(nextPage));
         }
         return list;
     }

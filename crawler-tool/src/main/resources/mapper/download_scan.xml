@@ -1,0 +1,41 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tool.doge.mapper.IDownloadScanMapper">
+
+    <insert id="saveDownloadScan" parameterType="com.tool.doge.model.DownloadScan">
+        INSERT INTO download_scan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `url`,`file_name`, `file_hash`, `category`, `success`
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{url}, #{fileName}, #{fileHash}, #{category}, #{success,jdbcType=BOOLEAN}
+        </trim>
+    </insert>
+    <insert id="saveDownloadScanList" parameterType="com.tool.doge.model.DownloadScan">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO download_scan
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                `url`,`file_name`, `file_hash`, `category`, `success`
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                #{item.url}, #{item.fileName}, #{item.fileHash}, #{item.category}, #{item.success,jdbcType=BOOLEAN}
+            </trim>
+            WHERE NOT EXISTS (SELECT url FROM download_scan WHERE url = #{item.url})
+        </foreach>
+    </insert>
+
+    <update id="updateDownloadScan" parameterType="com.tool.doge.model.DownloadScan">
+        UPDATE download_scan
+        <set>
+            <if test="success != null" >
+                success = #{success,jdbcType=BOOLEAN},
+            </if>
+        </set>
+        WHERE id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectDownloadScan" parameterType="java.lang.Integer">
+        SELECT * FROM download_scan
+        <where>success = false</where>
+        LIMIT #{limit}
+    </select>
+</mapper>

@@ -23,15 +23,57 @@
             </Policies>
             <DefaultRolloverStrategy max="20"/>
         </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="spring"
+                                 fileName="${LOG_HOME}/logs/spring.log"
+                                 filePattern="${LOG_HOME}/logs/spring/spring.log.%d{yyyy-MM-dd}-%i.gz">
+            <PatternLayout charset="UTF-8"
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="apache"
+                                 fileName="${LOG_HOME}/logs/apache.log"
+                                 filePattern="${LOG_HOME}/logs/apache/apache.log.%d{yyyy-MM-dd}-%i.gz">
+            <PatternLayout charset="UTF-8"
+                    pattern="%d %-5p (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
     </Appenders>
 
     <Loggers>
-        <logger name="crawler" level="debug" includeLocation="true" additivity="false">
+        <logger name="crawler" level="INFO" includeLocation="true" additivity="false">
+            <appender-ref ref="crawler"/>
+        </logger>
+        <logger name="com.yk" level="INFO" includeLocation="true" additivity="false">
+            <appender-ref ref="crawler"/>
+        </logger>
+        <logger name="com.tool" level="INFO" includeLocation="true" additivity="false">
             <appender-ref ref="crawler"/>
         </logger>
 
-        <root level="info" includeLocation="true">
+        <logger name="org.springframework" level="INFO" includeLocation="true" additivity="false">
+            <appender-ref ref="spring"/>
+        </logger>
+        <logger name="org.apache.ibatis" level="INFO" includeLocation="true" additivity="false">
+            <appender-ref ref="spring"/>
+        </logger>
+        <logger name="org.mybatis" level="INFO" includeLocation="true" additivity="false">
+            <appender-ref ref="spring"/>
+        </logger>
+        <logger name="org.apache" level="INFO" includeLocation="true" additivity="false">
+            <appender-ref ref="apache"/>
+        </logger>
+
+        <root level="INFO" includeLocation="true">
             <appender-ref ref="Console"/>
+            <appender-ref ref="crawler"/>
         </root>
     </Loggers>
 </Configuration>

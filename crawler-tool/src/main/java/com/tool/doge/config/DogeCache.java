@@ -1,5 +1,7 @@
 package com.tool.doge.config;
 
+import com.tool.doge.model.Host;
+
 import java.util.List;
 
 /**
@@ -11,5 +13,5 @@ import java.util.List;
  */
 public class DogeCache
 {
-    public static final ThreadLocal<List<String>> HOST_LIST = new ThreadLocal<>();
+    public static final ThreadLocal<List<Host>> HOST_LIST = new ThreadLocal<>();
 }

@@ -20,7 +20,7 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/crawler-tool?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&mysqlEncoding=utf8&serverTimezone=UTC&useSSL=false&allowMultiQueries=true
+    url: jdbc:mysql://127.0.0.1:13306/crawler-1?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&mysqlEncoding=utf8&serverTimezone=UTC&useSSL=false&allowMultiQueries=true
     username: ENC(skivFt3ountF9lG10v8UR8orBpjhNPXTog89C1Squ6F0vfWH4lCyYshVTij7ifW+)
     password: ENC(91QeITZDM4Rj729HLoIesrEamShFqq2Qjeq4hEtHUxm+4P1/SF9nUiNHlYFodtpW)
     hikari: # 使用hikari 连接池
@@ -35,12 +35,12 @@ spring:
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
-    password:
+    password: Admin@3.14uV$#Plhg
 doge:
   store-passwd: ENC(ZeMQwX7WMVja4AUrvoumDwaV/qRumK7JIBKDuizpyknb37sgufjVl/7dL7GfFFAvLUocas03rBDSlhDVk7fvKQ==)
   key-passwd: ENC(8MI2MQPpZIva1guTh++5cRwg4knCjOzF6MQLbG1dDFj84tJk4yq17MmYj/uautGjCeu4x4L+OubC9xi3vrh4lw==)
   # rsa-encrypted-1.pem
-  encrypted-passwd: ENC(8MI2MQPpZIva1guTh++5cRwg4knCjOzF6MQLbG1dDFj84tJk4yq17MmYj/uautGjCeu4x4L+OubC9xi3vrh4lw==)
+  encrypted-passwd: ENC(av5Bz0pcuLdY6HBDn8L9ZvChXPPNuHoVSTOyNRBND2tvofr9XhF2eCsqqWEF4aVUsqvHCbgwIdCzy7O1YctwLA==)
 server:
   port: 22913
   servlet:
@@ -55,6 +55,11 @@ server:
     key-store-password: ENC(ZrdLzFBrafpelp40DapQKnjbaQBsNNbnIjwsN7pLMV4NJ4KeXbeW/Ecw5/9Xr9gO)
     client-auth: NONE
 mybatis:
-  mapper-locations: classpath*:mappers/**/*.xml
+  mapper-locations: classpath*:mapper/**/*.xml
   type-aliases-package: com.tool.doge.model
   # mybatis auto configuration get base packages by springboot, so you do not need to use @MapperScan
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    com.tool.doge.mapper: DEBUG

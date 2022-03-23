@@ -1,0 +1,11 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tool.doge.mapper.IDownloadTypeMapper">
+
+    <select id="selectDownloadTypeList" resultType="com.tool.doge.model.DownloadType">
+        SELECT * FROM  download_type;
+    </select>
+
+    <insert id="saveDownloadType" parameterType="com.tool.doge.model.DownloadType">
+        INSERT INTO download_type (`type_name`) VALUES (#{typeName, jdbcType=VARCHAR});
+    </insert>
+</mapper>
