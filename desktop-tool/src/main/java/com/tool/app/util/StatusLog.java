@@ -1,7 +1,6 @@
 package com.tool.app.util;
 
 
-import com.tool.app.ui.panel.StatusPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

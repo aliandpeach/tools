@@ -288,7 +288,7 @@ public class PopTimingTip extends JComponent
             @Override
             public void mouseEntered(MouseEvent e)
             {
-                System.out.println();
+                //System.out.println();
             }
 
             @Override

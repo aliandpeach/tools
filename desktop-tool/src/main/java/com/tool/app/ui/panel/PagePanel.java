@@ -186,7 +186,7 @@ public class PagePanel<T> extends JPanel
                     int nextPage = page.nextPage();
                     if (nextPage == 0)
                     {
-                        System.out.println();
+                        //System.out.println();
                     }
                     currentPageTextField.setText(nextPage + "");
                     action.callback();

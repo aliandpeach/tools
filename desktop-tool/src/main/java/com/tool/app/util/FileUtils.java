@@ -1,5 +1,7 @@
 package com.tool.app.util;
 
+import com.opencsv.CSVReader;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -16,21 +18,13 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import com.opencsv.CSVReader;
-
 /**
  * 文件工具类
- *
- * @author Bob
  */
 public class FileUtils
 {
     /**
      * 复制文件
-     *
-     * @param sourceFile
-     * @param targetFile
-     * @throws IOException
      */
     public static void copyFile(File sourceFile, File targetFile) throws IOException
     {
@@ -61,10 +55,6 @@ public class FileUtils
 
     /**
      * 复制文件夹
-     *
-     * @param sourceDir
-     * @param targetDir
-     * @throws IOException
      */
     public static void copyDirectiory(String sourceDir, String targetDir) throws IOException
     {
@@ -95,9 +85,6 @@ public class FileUtils
 
     /**
      * 计算文件的 MD5 值
-     *
-     * @param file
-     * @return
      */
     public static String getFileMD5(File file)
     {
@@ -144,9 +131,6 @@ public class FileUtils
 
     /**
      * 计算文件的SHA-1值
-     *
-     * @param file
-     * @return
      */
     public static String getFileSha1(File file)
     {
@@ -192,8 +176,6 @@ public class FileUtils
 
     /***
      * 清空文件夹
-     *
-     * @param dir
      */
     public static void clearDirectiory(String dir)
     {
@@ -202,15 +184,10 @@ public class FileUtils
         {
             file.delete();
         }
-
     }
 
     /**
      * 读取csv文件到List
-     *
-     * @param csvFile
-     * @return 内容List（每行的字符串数组）
-     * @throws IOException
      */
     public static ArrayList<String[]> getCsvFileContentList(File csvFile) throws IOException
     {
@@ -261,10 +238,6 @@ public class FileUtils
 
     /**
      * 读取sql文件到List
-     *
-     * @param sqlFile
-     * @return 内容List（每行的字符串）
-     * @throws IOException
      */
     public static ArrayList<String> getSqlFileContentList(File sqlFile) throws IOException
     {
@@ -318,9 +291,6 @@ public class FileUtils
 
     /**
      * 转换文件大小
-     *
-     * @param fileS
-     * @return
      */
     public static String formetfilesize(long fileS)
     {

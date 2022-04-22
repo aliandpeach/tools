@@ -13,7 +13,7 @@ import java.util.Base64;
 
 public class DESPlus
 {
-    private static char[] PASSWD = new char[]{'t', 'e', 's', 't', '_', 'd', 'b', 's', '_', 'k', 'e', 'y', '_', 'h', 'h', 'g', 'f', 'd', 'o', 'y', 't', 'y', 't', '#', 'd', 's', 'd', '.', '1', '2', '#', '2', 'u', 'i'};
+    private static final char[] PASSWD = new char[]{'t', 'e', 's', 't', '_', 'd', 'b', 's', '_', 'k', 'e', 'y', '_', 'h', 'h', 'g', 'f', 'd', 'o', 'y', 't', 'y', 't', '#', 'd', 's', 'd', '.', '1', '2', '#', '2', 'u', 'i'};
 
     private static final String ALGORITHM = "PBEWITHHMACSHA512ANDAES_256";
 

@@ -58,7 +58,7 @@ public class App
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                logger.error("desktop tool start error", e);
             }
         });
     }
@@ -175,6 +175,6 @@ public class App
 
         // 初始化 H2
         h2Store = H2Store.getInstance();
-        logger.info("==================AppInitEnd");
+        logger.info("==================desktop tool started.");
     }
 }

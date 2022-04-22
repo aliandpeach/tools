@@ -15,6 +15,7 @@ import com.tool.app.db.Event;
 import com.tool.app.db.Page;
 import com.tool.app.db.Task;
 import com.tool.app.ui.UiConsts;
+import com.tool.app.ui.component.ComboBoxListCellRenderer;
 import com.tool.app.ui.component.MyIconButton;
 import com.tool.app.ui.listener.DropTargetListenerImpl;
 import com.tool.app.util.ConfigManager;
@@ -155,6 +156,8 @@ public class StatusPanel extends JPanel
         comboBoxPanel.add(label4ComboBox);
 
         jobComboBox = new JComboBox<>();
+        jobComboBox.setMaximumRowCount(10);
+        jobComboBox.setRenderer(new ComboBoxListCellRenderer());
         jobComboBox.setPreferredSize(new Dimension(200, 25));
         comboBoxModel = new DefaultComboBoxModel<>();
         comboBoxModel.addElement(new Item("", "请选择策略"));
@@ -432,7 +435,7 @@ public class StatusPanel extends JPanel
             @Override
             public void itemStateChanged(ItemEvent e)
             {
-                System.out.println();
+                // System.out.println();
             }
         });
         jobComboBox.addActionListener(new ActionListener()
@@ -440,7 +443,7 @@ public class StatusPanel extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                System.out.println();
+                //System.out.println();
             }
         });
         jobComboBox.addPopupMenuListener(new PopupMenuListener()
@@ -454,7 +457,7 @@ public class StatusPanel extends JPanel
                     StatusPanel.comboBoxModel.removeAllElements();
                     StatusPanel.comboBoxModel.addElement(new Item("0", "加载中..."));
 //                    IntStream.range(0, 10).forEach(i -> StatusPanel.comboBoxModel.addElement(new Item("", "")));
-                    new Thread(() ->
+                    Thread th = new Thread(() ->
                     {
                         HttpRequest httpRequest = HttpRequest.create()
                                 .uri("/SIMP_DBS_S/event/file/analysis/interface/job/list").method("GET").async()
@@ -486,7 +489,16 @@ public class StatusPanel extends JPanel
                                 .map(t -> new Item(t.getKey(), t.getValue()))
                                 .collect(Collectors.toList())
                                 .forEach(i -> StatusPanel.comboBoxModel.addElement(i));
-                    }).start();
+                    });
+                    th.start();
+                    try
+                    {
+                        th.join(10 * 1000);
+                    }
+                    catch (InterruptedException interruptedException)
+                    {
+                        logger.error("load job info timeout {}", interruptedException.getMessage());
+                    }
                 }
                 else
                 {
@@ -498,13 +510,13 @@ public class StatusPanel extends JPanel
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
             {
-                System.out.println();
+                //System.out.println();
             }
 
             @Override
             public void popupMenuCanceled(PopupMenuEvent e)
             {
-                System.out.println();
+                //System.out.println();
             }
         });
 
@@ -1025,6 +1037,10 @@ public class StatusPanel extends JPanel
                             testProgress.setValue(95);
                             App.h2Store.insertEvents(dbEvents);
                             testProgress.setValue(99);
+                        }
+                        else if ("无异常".equals(status))
+                        {
+                            JOptionPane.showMessageDialog(App.settingPanel, "没有检测出异常!", App.resourceBundle.getString("ui.tips"), JOptionPane.PLAIN_MESSAGE);
                         }
                     }
                     else
