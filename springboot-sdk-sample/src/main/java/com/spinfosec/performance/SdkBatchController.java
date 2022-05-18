@@ -199,7 +199,7 @@ public class SdkBatchController implements InitializingBean
                     group.setUseTime((reqEnd - reqStart));
                     group.setStart(reqStart);
                     group.setEnd(reqEnd);
-                    group.setName("request-" + result.getId() + "-" + counter.incrementAndGet());
+                    group.setName("request-" + "-" + counter.incrementAndGet());
                     all.add(group);
                     if (result.getStatus() == 200)
                     {
@@ -212,7 +212,7 @@ public class SdkBatchController implements InitializingBean
                 }
                 catch (Exception e)
                 {
-                    return new Response().id(e.getMessage() + "-" + counter.incrementAndGet()).status(405);
+                    return new Response().status(405);
                 }
             }, service);
             futures.add(future);
@@ -302,7 +302,7 @@ public class SdkBatchController implements InitializingBean
                 }
                 catch (Exception e)
                 {
-                    return new Response().id(e.getMessage() + "-" + counter.incrementAndGet()).status(405);
+                    return new Response().status(405);
                 }
             }, service);
             futures.add(future);
@@ -387,7 +387,7 @@ public class SdkBatchController implements InitializingBean
                     group.setUseTime((reqEnd - reqStart));
                     group.setStart(reqStart);
                     group.setEnd(reqEnd);
-                    group.setName("request-" + ftp.getId() + "-" + counter.incrementAndGet());
+                    group.setName("request-" + "-" + counter.incrementAndGet());
                     all.add(group);
                     if (ftp.getStatus() == 200)
                     {
@@ -402,7 +402,7 @@ public class SdkBatchController implements InitializingBean
                 {
                     Response r = new Response();
                     r.setEventResult(Collections.singletonMap("error", e.getMessage()));
-                    return r.id(e.getMessage() + "-" + counter.incrementAndGet()).status(405);
+                    return r.status(405);
                 }
             }, service);
             futures.add(future);
@@ -497,7 +497,7 @@ public class SdkBatchController implements InitializingBean
                 {
                     Response r = new Response();
                     r.setEventResult(Collections.singletonMap("error", e.getMessage()));
-                    return r.id(e.getMessage() + "-" + counter.incrementAndGet()).status(405);
+                    return r.status(405);
                 }
             }, service);
             futures.add(future);
