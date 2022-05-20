@@ -1,9 +1,12 @@
 package com.tool.app.ui.panel;
 
 import com.tool.app.App;
+import com.tool.app.db.Event;
 import com.tool.app.ui.component.OpacityFrame;
 import com.tool.app.ui.component.PopTimingTip;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -12,7 +15,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -25,6 +28,8 @@ import java.util.Optional;
  */
 public class EventView extends JPanel
 {
+    private static final Logger logger = LoggerFactory.getLogger(EventView.class);
+
     private JScrollPane scrollPane;
     private JTable table;
 
@@ -64,7 +69,12 @@ public class EventView extends JPanel
                     int columnIndex = table.columnAtPoint(point);
                     if (columnIndex == table.getColumnCount() - 1)
                     {
-                        com.tool.app.db.Event event = Optional.ofNullable(eventModel.getRowList()).orElseGet(ArrayList::new).get(rowIndex);
+                        if (null == eventModel.getRowList() || eventModel.getRowList().size() <= rowIndex)
+                        {
+                            logger.error("eventModel1 rowList is null or size less than rowIndex {}", rowIndex);
+                            return;
+                        }
+                        Event event = eventModel.getRowList().get(rowIndex);
                         App.mainPanelCenter.removeAll();
                         App.mainPanelCenter.add(App.detailPanel);
                         App.mainPanelCenter.updateUI();
@@ -89,7 +99,12 @@ public class EventView extends JPanel
                     }
                     if (columnIndex == table.getColumnCount() - 2)
                     {
-                        com.tool.app.db.Event event = Optional.ofNullable(eventModel.getRowList()).orElseGet(ArrayList::new).get(rowIndex);
+                        if (null == eventModel.getRowList() || eventModel.getRowList().size() <= rowIndex)
+                        {
+                            logger.error("eventModel2 rowList is null or size less than rowIndex {}", rowIndex);
+                            return;
+                        }
+                        Event event = eventModel.getRowList().get(rowIndex);
                         App.mainPanelCenter.removeAll();
                         App.mainPanelCenter.add(App.failedPanel);
                         App.mainPanelCenter.updateUI();

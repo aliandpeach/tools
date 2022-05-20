@@ -1,9 +1,12 @@
 package com.tool.app.ui.panel;
 
 import com.tool.app.App;
+import com.tool.app.db.Event;
 import com.tool.app.db.Task;
 import com.tool.app.ui.component.PopTimingTip;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -13,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -25,6 +29,8 @@ import java.util.Optional;
  */
 public class HistoryView extends JPanel
 {
+    private static final Logger logger = LoggerFactory.getLogger(HistoryView.class);
+
     private JScrollPane scrollPane;
     private JTable table;
 
@@ -107,7 +113,12 @@ public class HistoryView extends JPanel
                     int columnIndex = table.columnAtPoint(point);
                     if (columnIndex == table.getColumnCount() - 1)
                     {
-                        com.tool.app.db.Task task = Optional.ofNullable(taskHistoryModel.getRowList()).orElseGet(ArrayList::new).get(rowIndex);
+                        if (null == taskHistoryModel.getRowList() || taskHistoryModel.getRowList().size() <= rowIndex)
+                        {
+                            logger.error("taskHistoryModel rowList is null or size less than rowIndex {}", rowIndex);
+                            return;
+                        }
+                        Task task = taskHistoryModel.getRowList().get(rowIndex);
                         App.mainPanelCenter.removeAll();
                         App.mainPanelCenter.add(App.detailPanel);
                         App.mainPanelCenter.updateUI();

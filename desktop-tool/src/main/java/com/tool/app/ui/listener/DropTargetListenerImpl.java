@@ -60,7 +60,7 @@ public class DropTargetListenerImpl implements DropTargetListener
         {
             if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
             {
-                if (App.statusPanel.isRunning)
+                if (App.statusPanel.isRunning.get())
                 {
                     JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.test.task.running"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
                     return;

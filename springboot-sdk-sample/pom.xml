@@ -161,35 +161,9 @@
             <version>1.1.23</version>
         </dependency>
         <dependency>
-            <groupId>com.spinfosec</groupId>
-            <artifactId>SIMPLE-DBS-SDK</artifactId>
+            <groupId>com.yk</groupId>
+            <artifactId>http-request-sdk</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpmime</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>cn.hutool</groupId>
-                    <artifactId>hutool-all</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.activemq</groupId>
-                    <artifactId>activemq-client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.jcraft</groupId>
-                    <artifactId>jsch</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.yk.spring.pro</groupId>

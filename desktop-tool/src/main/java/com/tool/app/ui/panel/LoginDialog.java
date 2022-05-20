@@ -2,10 +2,10 @@ package com.tool.app.ui.panel;
 
 import cn.hutool.core.lang.Validator;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.spinfosec.connector.http.HttpRequest;
-import com.spinfosec.core.JSONUtil;
-import com.spinfosec.core.Response;
-import com.spinfosec.core.SpinfoExecutor;
+import com.yk.connector.http.HttpRequest;
+import com.yk.core.JSONUtil;
+import com.yk.core.Response;
+import com.yk.core.SdkExecutors;
 import com.tool.app.App;
 import com.tool.app.auth.AuthStore;
 import com.tool.app.auth.SM2Util;
@@ -252,7 +252,7 @@ public class LoginDialog extends JDialog
         }
 
         SM2Util sm2Util = new SM2Util();
-        Map<String, String> param = new HashMap<>();
+        Map<String, Object> param = new HashMap<>();
         try
         {
             param.put("username", sm2Util.encode(username, SM2Util.PUBLIC_KEY));
@@ -261,6 +261,11 @@ public class LoginDialog extends JDialog
         catch (Exception ex)
         {
             logger.error("sm2 encrypt error", ex);
+            logger.error("sm2 encrypt error username {} ", username);
+            logger.error("sm2 encrypt error password {} ", new String(password));
+            logger.error("sm2 encrypt error PUBLIC_KEY {} ", SM2Util.PUBLIC_KEY);
+            JOptionPane.showMessageDialog(_this, "用户名密码本地加密失败，请联系管理员!");
+            return;
         }
         HttpRequest httpRequest = HttpRequest.<Map<String, Object>>create()
                 .uri("/SIMP_DBS_S/api/auth/verification").method("POST").async()
@@ -268,7 +273,7 @@ public class LoginDialog extends JDialog
         Response response = null;
         try
         {
-            response = SpinfoExecutor.create().execute(httpRequest);
+            response = SdkExecutors.create().execute(httpRequest);
 
             String loginResult = response.getHttpResult();
             if (null == loginResult)

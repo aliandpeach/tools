@@ -2,14 +2,14 @@ package com.tool.app.ui.panel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.spinfosec.connector.http.HttpRequest;
-import com.spinfosec.core.JSONUtil;
-import com.spinfosec.core.Response;
-import com.spinfosec.core.SpinfoExecutor;
+import com.yk.connector.http.HttpRequest;
+import com.yk.core.JSONUtil;
+import com.yk.core.Response;
 import com.tool.app.db.Page;
 import com.tool.app.db.Task;
 import com.tool.app.ui.UiConsts;
 import com.tool.app.util.ConfigManager;
+import com.yk.core.SdkExecutors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,14 +89,7 @@ public class HistoryPanel extends JPanel
         tablePanel.add(historyView);
         lower.add(tablePanel);
 
-        pagePanel = new PagePanel<Task>(new PagePanel.PageActionCallback()
-        {
-            @Override
-            public void callback()
-            {
-                setContent();
-            }
-        });
+        pagePanel = new PagePanel<>(this::setContent);
         lower.add(pagePanel);
     }
 
@@ -128,7 +121,7 @@ public class HistoryPanel extends JPanel
                     }
                     String jobId = ((Item) selectedItem).getJobId();
 
-                    Map<String, String> params = new HashMap<>();
+                    Map<String, Object> params = new HashMap<>();
 
                     String c = "1";
                     try
@@ -157,7 +150,7 @@ public class HistoryPanel extends JPanel
                     HttpRequest httpRequest = HttpRequest.<QueryEventModel>create()
                             .uri("/SIMP_DBS_S/event/file/analysis/query/event/page").method("POST").async()
                             .params(params).host(serverHost.startsWith("https://") ? serverHost : "https://" + serverHost).build();
-                    Response response = SpinfoExecutor.create().execute(httpRequest);
+                    Response response = SdkExecutors.create().execute(httpRequest);
                     if (response.getStatus() == 200 && null != response.getHttpResult())
                     {
                         String result = response.getHttpResult();

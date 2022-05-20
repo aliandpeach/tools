@@ -1,11 +1,10 @@
 package com.tool.app.ui.panel;
 
 import cn.hutool.core.lang.Validator;
-import com.spinfosec.connector.http.HttpRequest;
-import com.spinfosec.core.Response;
-import com.spinfosec.core.SpinfoExecutor;
+import com.yk.connector.http.HttpRequest;
+import com.yk.core.Response;
+import com.yk.core.SdkExecutors;
 import com.tool.app.App;
-import com.tool.app.auth.ToolContext;
 import com.tool.app.ui.UiConsts;
 import com.tool.app.ui.component.MyIconButton;
 import com.tool.app.util.ConfigManager;
@@ -285,7 +284,6 @@ public class SettingPanel extends JPanel
         textFieldSftpPassword.setText(sftpPass);
 
         textFieldServerHost.setText(ConfigManager.getConfigManager().getServerHost());
-//        textFieldServerJobId.setText(ConfigManager.getConfigManager().getJobId());
     }
 
     /**
@@ -340,7 +338,7 @@ public class SettingPanel extends JPanel
                 HttpRequest httpRequest = HttpRequest.<Map<String, String>>create()
                         .uri("/SIMP_DBS_S/event/file/analysis/interface/job/list").method("GET").async()
                         .params(new HashMap<>()).host(serverHost.startsWith("https://") ? serverHost : "https://" + serverHost).build();
-                Response response = SpinfoExecutor.create().execute(httpRequest);
+                Response response = SdkExecutors.create().execute(httpRequest);
                 if (response.getStatus() != 200)
                 {
                     JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.test.connect.error"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);

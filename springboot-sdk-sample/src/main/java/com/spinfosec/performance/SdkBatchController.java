@@ -2,15 +2,15 @@ package com.spinfosec.performance;
 
 import cn.hutool.core.io.FileUtil;
 import com.google.common.util.concurrent.RateLimiter;
-import com.spinfosec.connector.http.HttpRequest;
-import com.spinfosec.connector.sftp.FtpRequest;
-import com.spinfosec.core.FileInfo;
-import com.spinfosec.core.PropertyLoader;
-import com.spinfosec.core.Response;
-import com.spinfosec.core.SpinfoExecutor;
-import com.spinfosec.core.SpinfoInfo;
 import com.spinfosec.exception.BaseResponse;
-import com.spinfosec.mq.MessageCenter;
+import com.yk.connector.http.HttpRequest;
+import com.yk.connector.sftp.FtpRequest;
+import com.yk.core.CommonInfo;
+import com.yk.core.FileInfo;
+import com.yk.core.PropertyLoader;
+import com.yk.core.Response;
+import com.yk.core.SdkExecutors;
+import com.yk.mq.MessageTaskManager;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -80,8 +81,8 @@ public class SdkBatchController implements InitializingBean
         {
             String limit = System.getProperty("limit");
             sdk.info("limit=" + limit);
-            SpinfoInfo info = PropertyLoader.loadProperties();
-            SpinfoExecutor.create().init(info);
+            CommonInfo info = PropertyLoader.loadProperties();
+            SdkExecutors.create().init(info);
         }
         catch (Throwable e)
         {
@@ -113,7 +114,7 @@ public class SdkBatchController implements InitializingBean
             result.addAll(dirInfoList);
         }
         return new ModelAndView("concurrent")
-                .addObject("host", SpinfoExecutor.create().getSpinfo().getDbsServerHost())
+                .addObject("host", "https://192.168.31.105:443")
                 .addObject("fileList", result)
                 .addObject("path", "");
     }
@@ -191,7 +192,7 @@ public class SdkBatchController implements InitializingBean
                     File data = targetFileList.get(_index);
 
                     FileInfo fileInfo = new FileInfo(data.getName(), data.getPath());
-                    Response result = SpinfoExecutor.create().upload(HttpRequest.uploader()
+                    Response result = SdkExecutors.create().upload(HttpRequest.uploader()
                             .file(fileInfo).build());
 
                     long reqEnd = System.currentTimeMillis();
@@ -296,8 +297,15 @@ public class SdkBatchController implements InitializingBean
                     File data = targetFileList.get(_index);
 
                     FileInfo fileInfo = new FileInfo(data.getName(), data.getPath());
-                    HttpRequest request = HttpRequest.uploader().file(fileInfo).async().manager(new Callback()).build();
-                    Response result = SpinfoExecutor.create().upload(request);
+                    HttpRequest request = HttpRequest.uploader().file(fileInfo).async().manager(new MessageTaskManager()
+                    {
+                        @Override
+                        protected void onMessageTask(Map<String, String> result)
+                        {
+
+                        }
+                    }).build();
+                    Response result = SdkExecutors.create().upload(request);
                     return result;
                 }
                 catch (Exception e)
@@ -380,7 +388,7 @@ public class SdkBatchController implements InitializingBean
                             .file(new FileInfo(data.getName(), data.getPath()))
                             .thenAnalyze()
                             .build();
-                    Response ftp = SpinfoExecutor.create().uploadBigFile(request);
+                    Response ftp = SdkExecutors.create().uploadBigFile(request);
 
                     long reqEnd = System.currentTimeMillis();
                     Group group = new Group();
@@ -479,7 +487,6 @@ public class SdkBatchController implements InitializingBean
             System.out.println("sftp index - " + _index);
             CompletableFuture<Response> future = CompletableFuture.supplyAsync(() ->
             {
-                String id = null;
                 try
                 {
                     limiter.acquire(1);
@@ -488,9 +495,15 @@ public class SdkBatchController implements InitializingBean
 
                     FtpRequest request = FtpRequest.upload()
                             .file(new FileInfo(data.getName(), data.getPath()))
-                            .thenAnalyze().async().manager(new Callback())
-                            .build();
-                    Response ftp = SpinfoExecutor.create().uploadBigFile(request);
+                            .thenAnalyze().async().manager(new MessageTaskManager()
+                            {
+                                @Override
+                                protected void onMessageTask(Map<String, String> result)
+                                {
+
+                                }
+                            }).build();
+                    Response ftp = SdkExecutors.create().uploadBigFile(request);
                     return ftp;
                 }
                 catch (Exception e)

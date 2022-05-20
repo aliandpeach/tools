@@ -1,15 +1,17 @@
 package com.tool.app.ui.panel;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.TypeReference;
 import com.alibaba.fastjson.JSON;
-import com.spinfosec.connector.http.HttpRequest;
-import com.spinfosec.connector.sftp.FtpRequest;
-import com.spinfosec.core.FileInfo;
-import com.spinfosec.core.JSONUtil;
-import com.spinfosec.core.Request;
-import com.spinfosec.core.Response;
-import com.spinfosec.core.SpinfoExecutor;
-import com.spinfosec.core.SpinfoInfo;
+import com.tool.app.ui.listener.EventMessageListener;
+import com.yk.connector.http.HttpRequest;
+import com.yk.connector.sftp.FtpRequest;
+import com.yk.core.FileInfo;
+import com.yk.core.JSONUtil;
+import com.yk.core.Request;
+import com.yk.core.Response;
+import com.yk.core.SdkExecutors;
+import com.yk.core.CommonInfo;
 import com.tool.app.App;
 import com.tool.app.db.Event;
 import com.tool.app.db.Page;
@@ -21,6 +23,8 @@ import com.tool.app.ui.listener.DropTargetListenerImpl;
 import com.tool.app.util.ConfigManager;
 import com.tool.app.util.ConstantsTools;
 import com.tool.app.util.DESPlus;
+import com.yk.mq.MessageCenter;
+import com.yk.mq.MessageTaskManager;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +47,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,14 +57,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 
 /**
@@ -90,15 +95,17 @@ public class StatusPanel extends JPanel
 
     public static DefaultComboBoxModel<Item> comboBoxModel;
 
-    public boolean isRunning = false;
+    public volatile AtomicBoolean isRunning = new AtomicBoolean(false);
 
-    private String currentActiveMQIp;
+    private volatile String currentRunningTaskId;
 
-    private String currentRunningRequestId;
-
-    public static ExecutorService service = Executors.newFixedThreadPool(2);
+    private volatile String currentActiveMQIp;
 
     private PagePanel<Event> pagePanel;
+
+    private final EventMessageListener eventMessageListener;
+
+    private final String id =  UUID.randomUUID().toString().replace("-", "");
 
     /**
      * 构造
@@ -109,6 +116,8 @@ public class StatusPanel extends JPanel
         initialize();
         addComponent();
         addListener();
+
+        eventMessageListener = new EventMessageListener(testProgress, this);
     }
 
     /**
@@ -264,62 +273,6 @@ public class StatusPanel extends JPanel
 //        resultPanel.setPreferredSize(new Dimension(800, 320));
 
         java.util.List<Event> eventList = new ArrayList<>();
-//        IntStream.range(0, 20).forEach(i ->
-//        {
-//            Event event2 = new Event();
-//            event2.setIndex(i + 1);
-//            event2.setFileName("2021-04-04测试文档12点20分.tar");
-//            event2.setTaskId("uuid-" + i);
-//            event2.setRule("rule-" + i);
-//
-//            String str = ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.txt\n" +
-//                    "服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.doc\n" +
-//                    "询服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.pdf\n" +
-//                    "询服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.doc\n" +
-//                    "询服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.pptx\n" +
-//                    "服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.txt\n" +
-//                    "服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.docx\n" +
-//                    "询服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.ppt\n" +
-//                    "服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.docx\n" +
-//                    "询服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.xls\n" +
-//                    "服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.xls\n" +
-//                    "服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;\n" +
-//                    "\n" +
-//                    ",;'][=-`1.zip/,;'][=-`1/路径10/路径9/路径8/路径7/路径6/路径5/路径4/路径3/路径2/路径1/测试文档.rtf\n" +
-//                    "询服务。c）智慧城市应用提供商。作为机密智慧城市服务提供者，为智慧城市开发应用，;";
-//            str += "\n" + str;
-//            String b = "";
-//            for (int k = 0; k < str.length(); k++)
-//            {
-//                int s = new Random().nextInt(str.length());
-//                b += str.charAt(s);
-//            }
-//            event2.setBreachContent(str);
-//            event2.setMatchContent("机密;秘密");
-//            event2.setSecretRate(3.2f);
-//            event2.setSensitivity(1);
-//            eventList.add(event2);
-//        });
 
         eventTableModel = new EventModel<>(eventList, EVENT_TABLE_COLUMN_NAMES);
         eventView = new EventView(eventTableModel);
@@ -348,14 +301,7 @@ public class StatusPanel extends JPanel
         buttonStop = new MyIconButton(UiConsts.ICON_STOP, UiConsts.ICON_STOP_ENABLE, UiConsts.ICON_STOP_DISABLE, "");
         buttonStop.setEnabled(false);
 
-        pagePanel = new PagePanel<Event>(new PagePanel.PageActionCallback()
-        {
-            @Override
-            public void callback()
-            {
-                setContent(currentRunningRequestId);
-            }
-        });
+        pagePanel = new PagePanel<>(() -> setContent(currentRunningTaskId));
         panelDown.add(pagePanel);
         return panelDown;
     }
@@ -365,6 +311,10 @@ public class StatusPanel extends JPanel
      */
     public void setContent(String taskId)
     {
+        if (null == taskId)
+        {
+            return;
+        }
         try
         {
             int c = 1;
@@ -402,10 +352,9 @@ public class StatusPanel extends JPanel
         buttonStop.addActionListener(e ->
         {
             buttonStop.setEnabled(false);
-            SpinfoExecutor.create().removeWaiting(currentRunningRequestId);
-            SpinfoExecutor.create().clearWaitingTask(currentRunningRequestId);
             testProgress.setValue(0);
-            isRunning = false;
+            isRunning.set(false);
+            currentRunningTaskId = null;
         });
 
 //        JTextArea textArea = new JTextArea();
@@ -451,60 +400,7 @@ public class StatusPanel extends JPanel
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e)
             {
-                String serverHost = ConfigManager.getConfigManager().getServerHost();
-                if (!Objects.isNull(serverHost))
-                {
-                    StatusPanel.comboBoxModel.removeAllElements();
-                    StatusPanel.comboBoxModel.addElement(new Item("0", "加载中..."));
-//                    IntStream.range(0, 10).forEach(i -> StatusPanel.comboBoxModel.addElement(new Item("", "")));
-                    Thread th = new Thread(() ->
-                    {
-                        HttpRequest httpRequest = HttpRequest.create()
-                                .uri("/SIMP_DBS_S/event/file/analysis/interface/job/list").method("GET").async()
-                                .params(new HashMap<>()).host(serverHost.startsWith("https://") ? serverHost : "https://" + serverHost).build();
-                        Response response = SpinfoExecutor.create().execute(httpRequest);
-                        if (response.getStatus() != 200)
-                        {
-                            StatusPanel.comboBoxModel.removeAllElements();
-                            StatusPanel.comboBoxModel.addElement(new Item("", "请选择策略"));
-                            JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.connect.error"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                        StatusPanel.comboBoxModel.removeAllElements();
-                        String result = response.getHttpResult();
-                        Map<String, String> resultBean = null;
-                        try
-                        {
-                            resultBean = JSONUtil.fromJson(result, new com.fasterxml.jackson.core.type.TypeReference<Map<String, String>>()
-                            {
-                            });
-                        }
-                        catch (IOException ioException)
-                        {
-                            logger.error("parse /interface/job/list result error {}", result);
-                            JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.empty.or.null"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                        resultBean.entrySet().stream()
-                                .map(t -> new Item(t.getKey(), t.getValue()))
-                                .collect(Collectors.toList())
-                                .forEach(i -> StatusPanel.comboBoxModel.addElement(i));
-                    });
-                    th.start();
-                    try
-                    {
-                        th.join(10 * 1000);
-                    }
-                    catch (InterruptedException interruptedException)
-                    {
-                        logger.error("load job info timeout {}", interruptedException.getMessage());
-                    }
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.empty.or.null"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+                refreshPolicyCheckbox();
             }
 
             @Override
@@ -575,13 +471,8 @@ public class StatusPanel extends JPanel
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                if (null != currentRunningRequestId)
-                {
-                    SpinfoExecutor.create().removeWaiting(currentRunningRequestId);
-                    SpinfoExecutor.create().clearWaitingTask(currentRunningRequestId);
-                }
                 testProgress.setValue(0);
-                isRunning = false;
+                isRunning.set(false);;
             }
 
             @Override
@@ -610,6 +501,64 @@ public class StatusPanel extends JPanel
         });
     }
 
+    private void refreshPolicyCheckbox()
+    {
+        String serverHost = ConfigManager.getConfigManager().getServerHost();
+        if (!Objects.isNull(serverHost))
+        {
+            StatusPanel.comboBoxModel.removeAllElements();
+            StatusPanel.comboBoxModel.addElement(new Item("0", "加载中..."));
+//                    IntStream.range(0, 10).forEach(i -> StatusPanel.comboBoxModel.addElement(new Item("", "")));
+            Thread th = new Thread(() ->
+            {
+                HttpRequest httpRequest = HttpRequest.create()
+                        .uri("/SIMP_DBS_S/event/file/analysis/interface/job/list").method("GET").async()
+                        .params(new HashMap<>()).host(serverHost.startsWith("https://") ? serverHost : "https://" + serverHost).build();
+                Response response = SdkExecutors.create().execute(httpRequest);
+                if (response.getStatus() != 200)
+                {
+                    StatusPanel.comboBoxModel.removeAllElements();
+                    StatusPanel.comboBoxModel.addElement(new Item("", "请选择策略"));
+                    JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.connect.error"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                StatusPanel.comboBoxModel.removeAllElements();
+                String result = response.getHttpResult();
+                Map<String, String> resultBean = null;
+                try
+                {
+                    resultBean = JSONUtil.fromJson(result, new com.fasterxml.jackson.core.type.TypeReference<Map<String, String>>()
+                    {
+                    });
+                }
+                catch (IOException ioException)
+                {
+                    logger.error("parse /interface/job/list result error {}", result);
+                    JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.empty.or.null"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                resultBean.entrySet().stream()
+                        .map(t -> new Item(t.getKey(), t.getValue()))
+                        .collect(Collectors.toList())
+                        .forEach(i -> StatusPanel.comboBoxModel.addElement(i));
+            });
+            th.start();
+            try
+            {
+                th.join(10 * 1000);
+            }
+            catch (InterruptedException interruptedException)
+            {
+                logger.error("load job info timeout {}", interruptedException.getMessage());
+            }
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.setting.server.host.empty.or.null"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }
+
     /**
      * 获取指定时间对应的毫秒数
      */
@@ -631,6 +580,7 @@ public class StatusPanel extends JPanel
 
     public void startTest(String filePath)
     {
+        currentRunningTaskId = null;
         DESPlus des = new DESPlus();
         ConfigManager.getConfigManager().reloadDom();
         boolean advancedSetting = ConfigManager.getConfigManager().getAdvancedSetting();
@@ -687,7 +637,7 @@ public class StatusPanel extends JPanel
                     .uri("/SIMP_DBS_S/event/file/analysis/interface/job/target/info").method("GET").async()
                     .params(new HashMap<>(Collections.singletonMap("jobId", jobId)))
                     .host(serverHost.startsWith("https://") ? serverHost : "https://" + serverHost).build();
-            Response response = SpinfoExecutor.create().execute(httpRequest);
+            Response response = SdkExecutors.create().execute(httpRequest);
             if (response.getStatus() != 200)
             {
                 JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.test.task.job.sftp.error"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
@@ -760,18 +710,17 @@ public class StatusPanel extends JPanel
         closeTimeout = ConfigManager.getConfigManager().getCloseTimeout();
 
         String serverHost = ConfigManager.getConfigManager().getServerHost();
-//        String jobId = ConfigManager.getConfigManager().getJobId();
 
         final String activeMQIPUsing = activeMQIp;
 
-        SpinfoInfo spinfoInfo = new SpinfoInfo();
-        spinfoInfo.setBrokerUrl(String.format(ConstantsTools.ACTIVE_MQ_URL, activeMQIp, activeMQIp));
-        spinfoInfo.setUsername(activeMQUsername);
-        spinfoInfo.setPassword(activeMQPasswd);
-        spinfoInfo.setKeystore(activeMQKeystore);
-        spinfoInfo.setKeystorePasswd(activeMQKeystorePasswd);
-        spinfoInfo.setTruststore(activeMQTruststore);
-        spinfoInfo.setTruststorePasswd(activeMQTruststorePasswd);
+        CommonInfo commonInfo = new CommonInfo();
+        commonInfo.setBrokerUrl(String.format(ConstantsTools.ACTIVE_MQ_URL, activeMQIp, activeMQIp));
+        commonInfo.setUsername(activeMQUsername);
+        commonInfo.setPassword(activeMQPasswd);
+        commonInfo.setKeystore(activeMQKeystore);
+        commonInfo.setKeystorePasswd(activeMQKeystorePasswd);
+        commonInfo.setTruststore(activeMQTruststore);
+        commonInfo.setTruststorePasswd(activeMQTruststorePasswd);
         int sendTimeoutInt = 12000;
         try
         {
@@ -780,7 +729,7 @@ public class StatusPanel extends JPanel
         catch (NumberFormatException e)
         {
         }
-        spinfoInfo.setSendTimeout(sendTimeoutInt);
+        commonInfo.setSendTimeout(sendTimeoutInt);
         int closeTimeoutInt = 12000;
         try
         {
@@ -789,11 +738,11 @@ public class StatusPanel extends JPanel
         catch (NumberFormatException e)
         {
         }
-        spinfoInfo.setCloseTimeout(closeTimeoutInt);
+        commonInfo.setCloseTimeout(closeTimeoutInt);
 
-        spinfoInfo.setFtpUsername(sftpUsername);
-        spinfoInfo.setFtpPassword(sftpPasswd);
-        spinfoInfo.setIp(sftpIp);
+        commonInfo.setFtpUsername(sftpUsername);
+        commonInfo.setFtpPassword(sftpPasswd);
+        commonInfo.setIp(sftpIp);
 
         int sftpPortInt = 22;
         try
@@ -803,10 +752,9 @@ public class StatusPanel extends JPanel
         catch (NumberFormatException e)
         {
         }
-        spinfoInfo.setPort(sftpPortInt);
+        commonInfo.setPort(sftpPortInt);
 
-        spinfoInfo.setDbsServerHost(serverHost.startsWith("https://") ? serverHost : "https://" + serverHost);
-        spinfoInfo.setJobId(jobId);
+        serverHost = serverHost.startsWith("https://") ? serverHost : "https://" + serverHost;
 
         if (StringUtils.isEmpty(activeMQIp))
         {
@@ -856,16 +804,22 @@ public class StatusPanel extends JPanel
             return;
         }
 
-        if (isRunning)
+        if (isRunning.get())
         {
             JOptionPane.showMessageDialog(App.settingPanel, App.resourceBundle.getString("tips.test.task.running"), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
             return;
         }
+        executeAndProcessResult(filePath, jobId, activeMQIPUsing, commonInfo);
+    }
+
+    private void executeAndProcessResult(String filePath, String jobId, String activeMQIPUsing, CommonInfo commonInfo)
+    {
+        ExecutorService service = Executors.newFixedThreadPool(3);
         testProgress.setValue(2);
-        service.submit(() ->
+        CompletableFuture.runAsync(() ->
         {
             Random random = new Random();
-            isRunning = true;
+            isRunning.set(true);
             buttonStop.setEnabled(true);
 //            resultTextArea.setText("");
             try
@@ -878,8 +832,8 @@ public class StatusPanel extends JPanel
             testProgress.setValue(5);
             try
             {
-                spinfoInfo.setForceReConnectActiveMQ(!activeMQIPUsing.equals(currentActiveMQIp));
-                SpinfoExecutor.create().init(spinfoInfo);
+                commonInfo.setForceReConnectActiveMQ(!activeMQIPUsing.equals(currentActiveMQIp));
+                SdkExecutors.create().init(commonInfo);
                 currentActiveMQIp = activeMQIPUsing;
             }
             catch (Exception e)
@@ -896,7 +850,7 @@ public class StatusPanel extends JPanel
                 return;
             }
 
-            FileInfo fileInfo = new FileInfo(data.getName(), data.getPath());
+            FileInfo fileInfo = new FileInfo(data.getName(), data.getPath(), jobId);
 
             try
             {
@@ -909,13 +863,15 @@ public class StatusPanel extends JPanel
             Request request = null;
             try
             {
+                // 不会重复订阅
+                MessageCenter.get().addSubscribes(eventMessageListener, id);
                 if (data.length() > 10 * 1024 * 1024L)
                 {
-                    request = FtpRequest.upload().file(fileInfo).thenAnalyze().build();
+                    request = FtpRequest.upload().file(fileInfo).thenAnalyze().async().manager(eventMessageListener).build();
                 }
                 else
                 {
-                    request = HttpRequest.uploader().file(fileInfo).build();
+                    request = HttpRequest.uploader().file(fileInfo).async().manager(eventMessageListener).build();
                 }
             }
             catch (Exception e)
@@ -923,160 +879,114 @@ public class StatusPanel extends JPanel
                 JOptionPane.showMessageDialog(App.settingPanel, e.getMessage(), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            final String requestId = request.getId();
-            final Request finalRequest = request;
-            currentRunningRequestId = requestId;
-            service.submit(() ->
-            {
-                testProgress.setValue(random.nextInt(20 - 10 + 1) + 10);
-                service.submit(() ->
-                {
-                    while (true)
-                    {
-                        if (!isRunning)
-                        {
-                            break;
-                        }
-                        try
-                        {
-                            TimeUnit.SECONDS.sleep(1);
-                        }
-                        catch (InterruptedException e)
-                        {
-                        }
-                        Map<String, String> param = new HashMap<>();
-                        param.put("taskId", requestId);
-                        HttpRequest httpRequest = HttpRequest.<Integer>create()
-                                .uri("/SIMP_DBS_S/event/file/analysis/analyze/progress").method("GET").async()
-                                .params(param).build();
-                        Response response = null;
-                        try
-                        {
-                            response = SpinfoExecutor.create().execute(httpRequest);
-                        }
-                        catch (Exception e)
-                        {
-                        }
-                        if (null != response && response.getStatus() == 200)
-                        {
-                            if (null != response.getHttpResult())
-                            {
-                                String progress = response.getHttpResult();
-                                try
-                                {
-                                    int p = Integer.parseInt(progress);
-                                    int min = Math.min(90, p);
-                                    int current = testProgress.getValue();
-                                    testProgress.setValue(Math.max(current, min));
-                                    if (p == 100)
-                                    {
-                                        break;
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                });
+            progressResult(service, random, request);
+        }, service);
+    }
 
+    private void progressResult(ExecutorService service, Random random, Request finalRequest)
+    {
+        CompletableFuture.runAsync(() ->
+        {
+            testProgress.setValue(random.nextInt(20 - 10 + 1) + 10);
+            String taskId = null;
+            try
+            {
+                Response result = null;
+                if (finalRequest instanceof FtpRequest)
+                {
+                    result = SdkExecutors.create().uploadBigFile((FtpRequest) finalRequest);
+                }
+                if (finalRequest instanceof HttpRequest)
+                {
+                    result = SdkExecutors.create().upload((HttpRequest) finalRequest);
+                }
+                if (null != result && result.getStatus() == 200 && null != result.getHttpResult())
+                {
+                    logger.info("upload result {}", result.getHttpResult());
+                    Map<String, String> httpResult = JSONUtil.fromJson(result.getHttpResult(), new com.fasterxml.jackson.core.type.TypeReference<Map<String, String>>(){});
+                    taskId = httpResult.get("taskId");
+                }
+                else
+                {
+                    String msg = Objects.isNull(result) || Objects.isNull(result.getHttpResult())
+                            ? "后台检测错误"
+                            : result.getHttpResult();
+                    JOptionPane.showMessageDialog(App.settingPanel, msg, App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.error("HttpRequest execute error", e);
+                JOptionPane.showMessageDialog(App.settingPanel, e.getMessage(), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
+            }
+            finally
+            {
+                currentRunningTaskId = taskId;
+                processProgress(service, taskId);
+            }
+        }, service);
+    }
+
+    private void processProgress(ExecutorService service, String taskId)
+    {
+        if (null == taskId)
+        {
+            service.shutdown();
+            return;
+        }
+
+        CompletableFuture.runAsync(() ->
+        {
+            while (true)
+            {
+                if (!isRunning.get())
+                {
+                    break;
+                }
                 try
                 {
-                    Response result = null;
-                    if (finalRequest instanceof FtpRequest)
-                    {
-                        result = SpinfoExecutor.create().uploadBigFile((FtpRequest) finalRequest);
-                    }
-                    if (finalRequest instanceof HttpRequest)
-                    {
-                        result = SpinfoExecutor.create().upload((HttpRequest) finalRequest);
-                    }
-                    if (result.getStatus() == 200)
-                    {
-                        String status = result.getEventResult().get("status");
-                        String breachContent = result.getEventResult().get("breachContent");
-                        String failedFiles = result.getEventResult().get("failedFiles");
-                        Task task = new Task();
-                        task.setTaskId(requestId);
-                        task.setJobId(jobId);
-                        task.setFileName(fileInfo.getName());
-                        task.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-                        App.h2Store.insertTask(task);
-
-                        testProgress.setValue(92);
-                        if ("有异常".equals(status))
-                        {
-                            java.util.List<Map<String, Object>> events = JSON.parseObject(breachContent, new TypeReference<java.util.List<Map<String, Object>>>()
-                            {
-                            });
-                            java.util.List<com.tool.app.db.Event> dbEvents = new ArrayList<>();
-                            for (Map<String, Object> event : events)
-                            {
-                                com.tool.app.db.Event dbEvent = new com.tool.app.db.Event();
-
-                                dbEvent.setTaskId(requestId);
-                                dbEvent.setRule(Objects.isNull(event.get("ruleName")) ? "" : event.get("ruleName").toString());
-                                dbEvent.setSensitivity(Objects.isNull(event.get("sensitivityId")) ? -1 : Integer.parseInt(event.get("sensitivityId").toString()));
-                                dbEvent.setSecretRate(Objects.isNull(event.get("secretRate")) ? 0 : Float.parseFloat(event.get("secretRate").toString()));
-                                dbEvent.setId(UUID.randomUUID().toString().replace("-", ""));
-                                dbEvent.setFileName(Objects.isNull(event.get("filepath")) ? "" : event.get("filepath").toString());
-                                dbEvent.setEventCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-                                dbEvent.setBreachContent(Objects.isNull(event.get("breachContent"))
-                                        ? !Objects.isNull(event.get("externalBreachContent")) ? event.get("externalBreachContent").toString() : ""
-                                        : event.get("breachContent").toString());
-                                dbEvent.setMatchContent(Objects.isNull(event.get("matchContent")) ? "" : event.get("matchContent").toString());
-                                dbEvent.setFailedFiles(Objects.isNull(failedFiles) ? "" : failedFiles);
-                                dbEvents.add(dbEvent);
-                            }
-                            testProgress.setValue(95);
-                            App.h2Store.insertEvents(dbEvents);
-                            testProgress.setValue(99);
-                        }
-                        else if ("无异常".equals(status))
-                        {
-                            JOptionPane.showMessageDialog(App.settingPanel, "没有检测出异常!", App.resourceBundle.getString("ui.tips"), JOptionPane.PLAIN_MESSAGE);
-                        }
-                    }
-                    else
-                    {
-                        String msg = Objects.isNull(result.getHttpResult())
-                                ? "后台检测错误"
-                                : result.getHttpResult();
-                        JOptionPane.showMessageDialog(App.settingPanel, msg, App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
-                    }
+                    TimeUnit.SECONDS.sleep(2);
+                }
+                catch (InterruptedException e)
+                {
+                }
+                Map<String, Object> param = new HashMap<>();
+                param.put("taskId", taskId);
+                HttpRequest httpRequest = HttpRequest.<Integer>create()
+                        .uri("/SIMP_DBS_S/event/file/analysis/analyze/progress").method("GET").async()
+                        .params(param).build();
+                Response response = null;
+                try
+                {
+                    response = SdkExecutors.create().execute(httpRequest);
                 }
                 catch (Exception e)
                 {
-                    logger.error("HttpRequest execute error", e);
-                    JOptionPane.showMessageDialog(App.settingPanel, e.getMessage(), App.resourceBundle.getString("ui.tips"), JOptionPane.ERROR_MESSAGE);
                 }
-                finally
+                if (!isRunning.get())
                 {
-                    SpinfoExecutor.create().removeWaiting(requestId);
-                    SpinfoExecutor.create().clearWaitingTask(requestId);
-
-                    if (!isRunning)
-                    {
-                        testProgress.setValue(0);
-                    }
-                    else
-                    {
-                        testProgress.setValue(100);
-                    }
-
-                    isRunning = false;
-                    buttonStop.setEnabled(false);
-
-                    setContent(requestId);
-                    testProgress.setValue(100);
+                    break;
                 }
-            });
-        });
+                if (null == response || response.getStatus() != 200)
+                {
+                    continue;
+                }
+                String progress = response.getHttpResult();
+                if (!StringUtils.isNumeric(progress))
+                {
+                    continue;
+                }
+
+                int p = Integer.parseInt(progress);
+                int min = Math.min(90, p);
+                int current = testProgress.getValue();
+                testProgress.setValue(Math.max(current, min));
+                if (p == 100)
+                {
+                    break;
+                }
+            }
+            service.shutdown();
+        }, service);
     }
 }
